@@ -21,25 +21,83 @@ interface CardType {
   target?: string;
   imageUrl?: string;
   sprintId?: string;
+  order?: number;
 }
 
 interface ColumnProps {
   id: string;
   title: string;
   cards: CardType[];
+  moveCard?: (
+    cardId: string,
+    fromColumnId: string,
+    toColumnId: string,
+    newPosition?: number
+  ) => void;
+  onCardClick?: (card: CardType) => void;
 }
 
-export default function Column({ id, title, cards }: ColumnProps) {
-  const { moveCard, hasPermission, updateCard } = useDatabase();
+// Drop zone component for reordering within column
+const DropZone = ({
+  position,
+  onDrop,
+  columnId,
+}: {
+  position: number;
+  onDrop: (
+    cardId: string,
+    fromColumnId: string,
+    toColumnId: string,
+    newPosition: number
+  ) => void;
+  columnId: string;
+}) => {
+  const [{ isOver }, drop] = useDrop(() => ({
+    accept: "card",
+    drop: (item: { id: string; columnId: string }) => {
+      onDrop(item.id, item.columnId, columnId, position);
+    },
+    collect: (monitor) => ({
+      isOver: !!monitor.isOver(),
+    }),
+  }));
+
+  return (
+    <div
+      ref={drop}
+      className={`h-3 w-full rounded-lg transition-all duration-200 mx-auto my-1 ${
+        isOver
+          ? "bg-indigo-500 h-6 shadow-lg transform scale-105"
+          : "bg-indigo-200/50 hover:bg-indigo-300/50"
+      }`}
+    >
+      {isOver && (
+        <div className="flex items-center justify-center h-full">
+          <div className="w-4 h-4 rounded-full bg-white"></div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default function Column({
+  id,
+  title,
+  cards,
+  moveCard,
+  onCardClick,
+}: ColumnProps) {
+  const { hasPermission, updateCard } = useDatabase();
   const canDrop = hasPermission("move_task");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<CardType | null>(null);
   const columnRef = useRef<HTMLDivElement>(null);
 
-  const [{ isOver }, drop] = useDrop(() => ({
+  const [{ isOver }, dropRef] = useDrop(() => ({
     accept: "card",
     drop: (item: { id: string; columnId: string }) => {
-      if (item.columnId !== id) {
+      // Handle drops from different columns or same column
+      if (moveCard) {
         moveCard(item.id, item.columnId, id);
       }
     },
@@ -52,9 +110,10 @@ export default function Column({ id, title, cards }: ColumnProps) {
   // Attach the drop ref to our columnRef
   useEffect(() => {
     if (columnRef.current) {
-      drop(columnRef.current);
+      // @ts-expect-error - React DnD ref handling
+      dropRef(columnRef.current);
     }
-  }, [drop, canDrop]);
+  }, [dropRef, canDrop]);
 
   const handleCardClick = (card: CardType) => {
     // Check if user has permission to edit tasks
@@ -63,6 +122,9 @@ export default function Column({ id, title, cards }: ColumnProps) {
       setIsEditModalOpen(true);
     } else {
       console.log("Card clicked:", card);
+      if (onCardClick) {
+        onCardClick(card);
+      }
     }
   };
 
@@ -78,6 +140,17 @@ export default function Column({ id, title, cards }: ColumnProps) {
     setEditingTask(null);
   };
 
+  const handleMoveCard = (
+    cardId: string,
+    fromColumnId: string,
+    toColumnId: string,
+    newPosition: number
+  ) => {
+    if (moveCard) {
+      moveCard(cardId, fromColumnId, toColumnId, newPosition);
+    }
+  };
+
   // Calculate priority counts for the header
   const priorityCounts = {
     critical: cards.filter((card) => card.priority === "critical").length,
@@ -86,12 +159,17 @@ export default function Column({ id, title, cards }: ColumnProps) {
     low: cards.filter((card) => card.priority === "low").length,
   };
 
+  // Sort cards by order
+  const sortedCards = [...cards].sort(
+    (a, b) => (a.order || 0) - (b.order || 0)
+  );
+
   return (
     <div
       ref={columnRef}
-      className={`bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-xl p-4 w-80 transition-all duration-300 shadow-lg ${
+      className={`bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-xl p-4 w-80 md:w-96 lg:w-[32rem] transition-all duration-300 shadow-lg ${
         isOver && canDrop
-          ? "ring-2 ring-indigo-500 bg-gradient-to-b from-indigo-50 to-gray-100 dark:from-indigo-900/30 dark:to-gray-800"
+          ? "ring-4 ring-indigo-500 bg-gradient-to-b from-indigo-50 to-gray-100 dark:from-indigo-900/30 dark:to-gray-800 scale-[1.02]"
           : ""
       } ${!canDrop ? "opacity-75" : ""}`}
     >
@@ -134,33 +212,43 @@ export default function Column({ id, title, cards }: ColumnProps) {
           )}
         </div>
       </div>
-      <div className="min-h-[100px] space-y-3">
-        {cards.map((card, index) => (
-          <motion.div
-            key={card.id}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.3, delay: index * 0.1 }}
-            whileHover={{ y: -5 }}
-            className="cursor-pointer"
-          >
-            <Card
-              id={card.id}
-              taskId={card.taskId || `TASK-${card.id}`}
+      <div className="min-h-[100px]">
+        {/* Drop zone at the top of the column */}
+        <DropZone position={0} onDrop={handleMoveCard} columnId={id} />
+
+        {sortedCards.map((card, index) => (
+          <div key={card.id}>
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
+              whileHover={{ y: -5 }}
+              className="cursor-pointer"
+            >
+              <Card
+                id={card.id}
+                taskId={card.taskId || `TASK-${card.id}`}
+                columnId={id}
+                title={card.title}
+                description={card.description}
+                priority={card.priority}
+                storyPoints={card.storyPoints}
+                assignee={card.assignee}
+                progress={card.progress}
+                timeEstimate={card.timeEstimate}
+                module={card.module}
+                target={card.target}
+                imageUrl={card.imageUrl}
+                onClick={() => handleCardClick(card)}
+              />
+            </motion.div>
+            {/* Drop zone between cards */}
+            <DropZone
+              position={index + 1}
+              onDrop={handleMoveCard}
               columnId={id}
-              title={card.title}
-              description={card.description}
-              priority={card.priority}
-              storyPoints={card.storyPoints}
-              assignee={card.assignee}
-              progress={card.progress}
-              timeEstimate={card.timeEstimate}
-              module={card.module}
-              target={card.target}
-              imageUrl={card.imageUrl}
-              onClick={() => handleCardClick(card)}
             />
-          </motion.div>
+          </div>
         ))}
       </div>
       <TaskEditModal

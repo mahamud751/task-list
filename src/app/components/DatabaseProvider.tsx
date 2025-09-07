@@ -19,6 +19,7 @@ interface CardType {
   target?: string;
   imageUrl?: string;
   sprintId?: string;
+  order?: number; // Add order field
 }
 
 // Define ColumnType interface
@@ -46,7 +47,8 @@ interface DataContextType {
   moveCard: (
     cardId: string,
     fromColumnId: string,
-    toColumnId: string
+    toColumnId: string,
+    newPosition?: number // Add optional newPosition parameter
   ) => Promise<void>;
   // Sprint functions
   refreshSprints: () => Promise<void>;
@@ -135,6 +137,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
           target: task.target || undefined,
           imageUrl: task.imageUrl || undefined,
           sprintId: task.sprintId || undefined,
+          order: task.order || undefined, // Add order field
           startDate: task.startDate
             ? new Date(task.startDate).toISOString().split("T")[0]
             : undefined,
@@ -327,7 +330,8 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
   const moveCard = async (
     cardId: string,
     fromColumnId: string,
-    toColumnId: string
+    toColumnId: string,
+    newPosition?: number // Optional parameter for new position within the same column
   ) => {
     // Check if user has permission to move cards
     if (
@@ -339,20 +343,69 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      // Update the task's column in the database
-      const response = await fetch(`/api/tasks`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: cardId,
-          columnId: toColumnId,
-        }),
-      });
+      // If moving within the same column and a new position is specified
+      if (fromColumnId === toColumnId && newPosition !== undefined) {
+        // Get the current column data
+        const column = columns.find((col) => col.id === fromColumnId);
+        if (column) {
+          // Sort cards by current order
+          const sortedCards = [...column.cards].sort(
+            (a, b) => (a.order || 0) - (b.order || 0)
+          );
 
-      if (!response.ok) {
-        throw new Error("Failed to move task");
+          // Find the card being moved
+          const cardIndex = sortedCards.findIndex((card) => card.id === cardId);
+          if (cardIndex !== -1) {
+            // Remove card from current position
+            const [movedCard] = sortedCards.splice(cardIndex, 1);
+
+            // Insert card at new position
+            sortedCards.splice(newPosition, 0, movedCard);
+
+            // Update order for all cards in the column
+            const updatePromises = sortedCards.map((card, index) => {
+              return fetch(`/api/tasks`, {
+                method: "PATCH",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  id: card.id,
+                  order: index,
+                }),
+              });
+            });
+
+            // Wait for all updates to complete
+            await Promise.all(updatePromises);
+          }
+        }
+      } else {
+        // Moving to a different column or no specific position specified
+        const updates: any = { id: cardId, columnId: toColumnId };
+
+        // If moving to a different column, put at the end
+        if (fromColumnId !== toColumnId) {
+          const targetColumn = columns.find((col) => col.id === toColumnId);
+          if (targetColumn) {
+            updates.order = targetColumn.cards.length;
+          }
+        } else if (newPosition !== undefined) {
+          // Moving within same column but no specific handling needed
+          updates.order = newPosition;
+        }
+
+        const response = await fetch(`/api/tasks`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updates),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to move task");
+        }
       }
 
       await refreshData();

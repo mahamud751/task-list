@@ -510,7 +510,7 @@ export default function SprintDetailView({
             theme === "dark" ? "dark:bg-gray-900" : "bg-gray-50"
           }`}
         >
-          <div className="flex space-x-4 overflow-x-auto">
+          <div className="flex space-x-4 overflow-x-auto pb-4">
             {filteredColumns.map((column, index) => (
               <motion.div
                 key={column.id}

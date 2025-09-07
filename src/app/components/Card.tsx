@@ -3,6 +3,7 @@
 import { useDrag } from "react-dnd";
 import { motion } from "framer-motion";
 import { useDatabase } from "./DatabaseProvider";
+import { useRef } from "react";
 
 interface CardProps {
   id: string;
@@ -39,6 +40,7 @@ export default function Card({
 }: CardProps) {
   const { hasPermission } = useDatabase();
   const canDrag = hasPermission("move_task");
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "card",
@@ -48,6 +50,11 @@ export default function Card({
     }),
     canDrag: () => canDrag, // Only allow dragging if user has permission
   }));
+
+  // Connect drag ref to the card ref
+  if (canDrag) {
+    drag(cardRef);
+  }
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -96,7 +103,7 @@ export default function Card({
 
   return (
     <motion.div
-      ref={canDrag ? drag : null} // Only attach drag ref if user can drag
+      ref={cardRef}
       onClick={onClick}
       className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 mb-3 transition-all duration-300 transform card-hover border-l-4 ${
         priority === "critical"
@@ -112,7 +119,9 @@ export default function Card({
         canDrag
           ? "cursor-move hover:cursor-pointer hover:shadow-xl"
           : "cursor-default"
-      } ${getPriorityGlow(priority)}`}
+      } ${getPriorityGlow(priority)} ${
+        isDragging ? "ring-2 ring-indigo-500 scale-105 z-50" : ""
+      }`}
       whileHover={
         canDrag
           ? {
@@ -124,47 +133,53 @@ export default function Card({
       }
       whileTap={canDrag ? { scale: 0.98 } : {}}
       animate={{
-        opacity: isDragging ? 0.5 : 1,
-        scale: isDragging ? 0.95 : 1,
-        rotate: isDragging ? 2 : 0,
+        opacity: isDragging ? 0.8 : 1,
+        scale: isDragging ? 1.05 : 1,
+        rotate: isDragging ? 0 : 0,
       }}
       transition={{ duration: 0.2 }}
     >
       <div className="flex justify-between items-start">
-        <div>
+        <div className="min-w-0 flex-1">
+          {" "}
+          {/* Added min-w-0 and flex-1 to handle text overflow */}
           <div className="flex items-center">
-            <span className="text-xs font-medium text-indigo-600 dark:text-indigo-400 mr-2">
+            <span className="text-xs font-medium text-indigo-600 dark:text-indigo-400 mr-2 flex-shrink-0">
               {taskId}
             </span>
-            <h3 className="font-semibold text-gray-800 dark:text-white">
+            <h3 className="font-semibold text-gray-800 dark:text-white truncate">
+              {" "}
+              {/* Added truncate */}
               {title}
             </h3>
           </div>
           {(module || target) && (
             <div className="flex flex-wrap gap-1 mt-2">
               {module && (
-                <span className="text-xs px-2 py-1 bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 rounded-full dark:from-blue-900 dark:to-indigo-900 dark:text-blue-300">
+                <span className="text-xs px-2 py-1 bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 rounded-full dark:from-blue-900 dark:to-indigo-900 dark:text-blue-300 whitespace-nowrap">
                   {module}
                 </span>
               )}
               {target && (
-                <span className="text-xs px-2 py-1 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 rounded-full dark:from-purple-900 dark:to-pink-900 dark:text-purple-300">
+                <span className="text-xs px-2 py-1 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 rounded-full dark:from-purple-900 dark:to-pink-900 dark:text-purple-300 whitespace-nowrap">
                   {target}
                 </span>
               )}
             </div>
           )}
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 ml-2 flex-shrink-0">
+          {" "}
+          {/* Added ml-2 and flex-shrink-0 */}
           {storyPoints && (
-            <span className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-xs font-medium px-2 py-1 rounded-full shadow">
+            <span className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-xs font-medium px-2 py-1 rounded-full shadow whitespace-nowrap">
               {storyPoints} pts
             </span>
           )}
           <span
             className={`w-3 h-3 rounded-full ${getPriorityColor(
               priority
-            )} shadow-sm`}
+            )} shadow-sm flex-shrink-0`}
           ></span>
         </div>
       </div>
@@ -194,12 +209,12 @@ export default function Card({
         <div className="flex space-x-2">
           {assignee ? (
             <div className="flex -space-x-2">
-              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold shadow-sm">
+              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold shadow-sm flex-shrink-0">
                 {assignee.charAt(0).toUpperCase()}
               </div>
             </div>
           ) : (
-            <div className="bg-gray-200 border-2 border-dashed rounded-full w-7 h-7 dark:bg-gray-700" />
+            <div className="bg-gray-200 border-2 border-dashed rounded-full w-7 h-7 dark:bg-gray-700 flex-shrink-0" />
           )}
         </div>
 
@@ -207,7 +222,7 @@ export default function Card({
           {timeEstimate && (
             <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
               <svg
-                className="w-4 h-4 mr-1"
+                className="w-4 h-4 mr-1 flex-shrink-0"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -219,12 +234,13 @@ export default function Card({
                   d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                 ></path>
               </svg>
-              <span>{timeEstimate}</span>
+              <span className="truncate max-w-[60px]">{timeEstimate}</span>{" "}
+              {/* Added truncate with max-width */}
             </div>
           )}
           <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
             <svg
-              className="w-4 h-4 mr-1"
+              className="w-4 h-4 mr-1 flex-shrink-0"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"

@@ -62,6 +62,7 @@ model Task {
   sprint      Sprint?  @relation(fields: [sprintId], references: [id])
   startDate   DateTime?
   dueDate     DateTime?
+  order       Int      @default(0) // Order of task within column
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
