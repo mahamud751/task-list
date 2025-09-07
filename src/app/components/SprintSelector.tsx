@@ -3,21 +3,23 @@
 import { useState } from "react";
 import { useDatabase } from "./DatabaseProvider";
 import { motion } from "framer-motion";
+import { useTheme } from "./ThemeProvider";
 
 export default function SprintSelector() {
   const { sprints, currentSprint, setCurrentSprint } = useDatabase();
+  const { theme } = useTheme();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
-        return "bg-green-500";
+        return theme === "dark" ? "bg-green-600" : "bg-green-500";
       case "completed":
-        return "bg-blue-500";
+        return theme === "dark" ? "bg-blue-600" : "bg-blue-500";
       case "planned":
-        return "bg-yellow-500";
+        return theme === "dark" ? "bg-yellow-600" : "bg-yellow-500";
       default:
-        return "bg-gray-500";
+        return theme === "dark" ? "bg-gray-600" : "bg-gray-500";
     }
   };
 
@@ -34,11 +36,29 @@ export default function SprintSelector() {
     }
   };
 
+  // Theme-based colors
+  const buttonBgColor = theme === "dark" ? "dark:bg-gray-800" : "bg-white";
+  const buttonBorderColor =
+    theme === "dark" ? "dark:border-gray-600" : "border-gray-300";
+  const buttonTextColor =
+    theme === "dark" ? "dark:text-white" : "text-gray-700";
+  const buttonHoverBgColor =
+    theme === "dark" ? "dark:hover:bg-gray-700" : "hover:bg-gray-50";
+  const dropdownBgColor = theme === "dark" ? "dark:bg-gray-800" : "bg-white";
+  const dropdownItemTextColor =
+    theme === "dark" ? "dark:text-gray-300" : "text-gray-700";
+  const dropdownItemHoverBgColor =
+    theme === "dark" ? "dark:hover:bg-gray-700" : "hover:bg-gray-100";
+  const activeItemBgColor =
+    theme === "dark" ? "dark:bg-indigo-900" : "bg-indigo-100";
+  const activeItemTextColor =
+    theme === "dark" ? "dark:text-indigo-100" : "text-indigo-900";
+
   return (
     <div className="relative">
       <motion.button
         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-        className="flex items-center justify-between w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:hover:bg-gray-700"
+        className={`flex items-center justify-between w-full px-4 py-2 text-sm font-medium ${buttonTextColor} ${buttonBgColor} border ${buttonBorderColor} rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${buttonHoverBgColor} transition-colors duration-200`}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
       >
@@ -59,7 +79,7 @@ export default function SprintSelector() {
         <svg
           className={`w-5 h-5 ml-2 transition-transform duration-200 ${
             isDropdownOpen ? "rotate-180" : ""
-          }`}
+          } ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -75,7 +95,7 @@ export default function SprintSelector() {
 
       {isDropdownOpen && (
         <motion.div
-          className="absolute z-10 w-full mt-1 bg-white rounded-md shadow-lg dark:bg-gray-800"
+          className={`absolute z-10 w-full mt-1 ${dropdownBgColor} rounded-md shadow-lg`}
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2 }}
@@ -86,7 +106,7 @@ export default function SprintSelector() {
                 setCurrentSprint(null);
                 setIsDropdownOpen(false);
               }}
-              className="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+              className={`block w-full px-4 py-2 text-sm text-left ${dropdownItemTextColor} ${dropdownItemHoverBgColor} transition-colors duration-200`}
             >
               All Sprints
             </button>
@@ -99,9 +119,9 @@ export default function SprintSelector() {
                 }}
                 className={`block w-full px-4 py-2 text-sm text-left ${
                   currentSprint?.id === sprint.id
-                    ? "bg-indigo-100 text-indigo-900 dark:bg-indigo-900 dark:text-indigo-100"
-                    : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                }`}
+                    ? `${activeItemBgColor} ${activeItemTextColor}`
+                    : `${dropdownItemTextColor} ${dropdownItemHoverBgColor}`
+                } transition-colors duration-200`}
               >
                 <div className="flex items-center justify-between">
                   <span>{sprint.name}</span>
@@ -114,11 +134,19 @@ export default function SprintSelector() {
                   </span>
                 </div>
                 {sprint.description && (
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <div
+                    className={`text-xs mt-1 ${
+                      theme === "dark" ? "text-gray-400" : "text-gray-500"
+                    }`}
+                  >
                     {sprint.description}
                   </div>
                 )}
-                <div className="flex text-xs text-gray-500 dark:text-gray-400 mt-1">
+                <div
+                  className={`flex text-xs mt-1 ${
+                    theme === "dark" ? "text-gray-400" : "text-gray-500"
+                  }`}
+                >
                   {sprint.startDate && (
                     <span className="mr-2">
                       Start: {new Date(sprint.startDate).toLocaleDateString()}

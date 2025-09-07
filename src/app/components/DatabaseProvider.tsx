@@ -2,7 +2,6 @@
 
 import { useState, useEffect, createContext, useContext } from "react";
 import * as api from "../../lib/api";
-import { ColumnType } from "./DataProvider";
 import { userService, User } from "../../services/userService";
 
 // Define CardType with all necessary fields for database operations
@@ -20,6 +19,13 @@ interface CardType {
   target?: string;
   imageUrl?: string;
   sprintId?: string;
+}
+
+// Define ColumnType interface
+interface ColumnType {
+  id: string;
+  title: string;
+  cards: CardType[];
 }
 
 interface DataContextType {
@@ -129,6 +135,12 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
           target: task.target || undefined,
           imageUrl: task.imageUrl || undefined,
           sprintId: task.sprintId || undefined,
+          startDate: task.startDate
+            ? new Date(task.startDate).toISOString().split("T")[0]
+            : undefined,
+          dueDate: task.dueDate
+            ? new Date(task.dueDate).toISOString().split("T")[0]
+            : undefined,
         })),
       })) as ColumnType[];
 

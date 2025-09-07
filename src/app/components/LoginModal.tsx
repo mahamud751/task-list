@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDatabase } from "./DatabaseProvider";
+import { useTheme } from "./ThemeProvider";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -16,10 +17,34 @@ export default function LoginModal({
   onLogin,
 }: LoginModalProps) {
   const { login } = useDatabase();
+  const { theme } = useTheme();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Theme-based colors
+  const backgroundColor = theme === "dark" ? "dark:bg-gray-800" : "bg-white";
+  const textColor = theme === "dark" ? "dark:text-white" : "text-gray-900";
+  const secondaryTextColor =
+    theme === "dark" ? "dark:text-gray-300" : "text-gray-700";
+  const inputBgColor = theme === "dark" ? "dark:bg-gray-700" : "";
+  const inputBorderColor =
+    theme === "dark" ? "dark:border-gray-600" : "border-gray-300";
+  const inputTextColor = theme === "dark" ? "dark:text-white" : "";
+  const footerBgColor = theme === "dark" ? "dark:bg-gray-700" : "bg-gray-50";
+  const errorBgColor = theme === "dark" ? "bg-red-900" : "bg-red-100";
+  const errorTextColor = theme === "dark" ? "text-red-200" : "text-red-700";
+  const linkColor =
+    theme === "dark"
+      ? "dark:text-indigo-400 dark:hover:text-indigo-300"
+      : "text-indigo-600 hover:text-indigo-500";
+  const focusRingColor =
+    theme === "dark" ? "focus:ring-indigo-500" : "focus:ring-indigo-500";
+  const focusBorderColor =
+    theme === "dark" ? "focus:border-indigo-500" : "focus:border-indigo-500";
+  const dividerColor =
+    theme === "dark" ? "dark:border-gray-700" : "border-gray-200";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,45 +76,51 @@ export default function LoginModal({
           onClick={onClose}
         >
           <motion.div
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md"
+            className={`rounded-lg shadow-xl w-full max-w-md ${backgroundColor}`}
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+            <div className={`px-6 py-4 border-b ${dividerColor}`}>
+              <h2 className={`text-xl font-bold ${textColor}`}>
                 Login to Project Manager
               </h2>
             </div>
             <form onSubmit={handleSubmit} className="px-6 py-4">
               {error && (
-                <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
+                <div
+                  className={`mb-4 p-3 ${errorBgColor} ${errorTextColor} rounded-md`}
+                >
                   {error}
                 </div>
               )}
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label
+                    className={`block text-sm font-medium ${secondaryTextColor} mb-1`}
+                  >
                     Email
                   </label>
                   <input
                     type="email"
                     required
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    className={`w-full px-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-2 ${focusRingColor} ${focusBorderColor} ${inputBgColor} ${inputBorderColor} ${inputTextColor}`}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label
+                    className={`block text-sm font-medium ${secondaryTextColor} mb-1`}
+                  >
                     Password
                   </label>
                   <input
                     type="password"
                     required
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    className={`w-full px-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-2 ${focusRingColor} ${focusBorderColor} ${inputBgColor} ${inputBorderColor} ${inputTextColor}`}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
@@ -105,17 +136,14 @@ export default function LoginModal({
                     />
                     <label
                       htmlFor="remember-me"
-                      className="ml-2 block text-sm text-gray-700 dark:text-gray-300"
+                      className={`ml-2 block text-sm ${secondaryTextColor}`}
                     >
                       Remember me
                     </label>
                   </div>
 
                   <div className="text-sm">
-                    <a
-                      href="#"
-                      className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
-                    >
+                    <a href="#" className={`font-medium ${linkColor}`}>
                       Forgot your password?
                     </a>
                   </div>
@@ -154,13 +182,14 @@ export default function LoginModal({
                 </button>
               </div>
             </form>
-            <div className="px-6 py-4 bg-gray-50 dark:bg-gray-700 rounded-b-lg">
-              <div className="text-sm text-gray-600 dark:text-gray-400">
+            <div className={`px-6 py-4 rounded-b-lg ${footerBgColor}`}>
+              <div
+                className={`text-sm ${
+                  theme === "dark" ? "text-gray-400" : "text-gray-600"
+                }`}
+              >
                 Don't have an account?{" "}
-                <a
-                  href="#"
-                  className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
-                >
+                <a href="#" className={`font-medium ${linkColor}`}>
                   Sign up
                 </a>
               </div>

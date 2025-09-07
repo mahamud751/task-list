@@ -7,6 +7,8 @@ import Column from "./Column";
 import FloatingActionButton from "./FloatingActionButton";
 import TaskModal from "./TaskModal";
 import TaskEditModal from "./TaskEditModal";
+import TopNavbar from "./TopNavbar";
+import { useTheme } from "./ThemeProvider";
 
 interface CardType {
   id: string;
@@ -37,11 +39,15 @@ export default function SprintDetailView({
   onBack,
   onFilterChange,
   filters,
+  activeView,
+  onViewChange,
 }: {
   sprint: any;
   onBack: () => void;
   onFilterChange: (filters: FilterOptions) => void;
   filters: FilterOptions;
+  activeView: string;
+  onViewChange: (view: string) => void;
 }) {
   const {
     columns,
@@ -52,6 +58,7 @@ export default function SprintDetailView({
     hasPermission,
     users,
   } = useDatabase();
+  const { theme } = useTheme();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<CardType | null>(null);
@@ -180,13 +187,13 @@ export default function SprintDetailView({
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
-        return "bg-green-500";
+        return theme === "dark" ? "bg-green-600" : "bg-green-500";
       case "completed":
-        return "bg-blue-500";
+        return theme === "dark" ? "bg-blue-600" : "bg-blue-500";
       case "planned":
-        return "bg-yellow-500";
+        return theme === "dark" ? "bg-yellow-600" : "bg-yellow-500";
       default:
-        return "bg-gray-500";
+        return theme === "dark" ? "bg-gray-600" : "bg-gray-500";
     }
   };
 
@@ -203,14 +210,49 @@ export default function SprintDetailView({
     }
   };
 
+  // Theme-based colors
+  const sidebarBgColor = theme === "dark" ? "dark:bg-gray-800" : "bg-white";
+  const sidebarBorderColor =
+    theme === "dark" ? "dark:border-gray-700" : "border-gray-200";
+  const headerTextColor = theme === "dark" ? "text-white" : "text-gray-900";
+  const filterLabelColor = theme === "dark" ? "text-gray-300" : "text-gray-700";
+  const inputBgColor = theme === "dark" ? "dark:bg-gray-700" : "bg-white";
+  const inputBorderColor =
+    theme === "dark" ? "dark:border-gray-600" : "border-gray-300";
+  const inputTextColor = theme === "dark" ? "dark:text-white" : "text-gray-900";
+  const selectBgColor = theme === "dark" ? "dark:bg-gray-700" : "bg-white";
+  const selectBorderColor =
+    theme === "dark" ? "dark:border-gray-600" : "border-gray-300";
+  const selectTextColor =
+    theme === "dark" ? "dark:text-white" : "text-gray-900";
+
+  // Create a wrapper function for onViewChange that also clears the selected sprint
+  // when navigating away from the sprint detail view
+  const handleViewChange = (view: string) => {
+    // If switching to a different view (not sprints), clear the selected sprint
+    if (view !== "sprints") {
+      onBack(); // This will clear the selected sprint
+    }
+    onViewChange(view);
+  };
+
   return (
     <div className="flex-1 flex">
+      {/* Top Navigation */}
+      <TopNavbar activeView={activeView} onViewChange={handleViewChange} />
+
       {/* Sidebar Filters */}
-      <div className="w-64 bg-white dark:bg-gray-800 shadow-lg fixed left-0 top-0 bottom-0 z-40 overflow-y-auto">
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+      <div
+        className={`w-64 ${sidebarBgColor} shadow-lg fixed left-0 top-16 bottom-0 z-40 overflow-y-auto ${sidebarBorderColor} border-r`}
+      >
+        <div className={`p-4 ${sidebarBorderColor} border-b`}>
           <button
             onClick={onBack}
-            className="flex items-center text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+            className={`flex items-center ${
+              theme === "dark"
+                ? "text-gray-300 hover:text-white"
+                : "text-gray-600 hover:text-gray-900"
+            }`}
           >
             <svg
               className="w-5 h-5 mr-2"
@@ -227,7 +269,7 @@ export default function SprintDetailView({
             </svg>
             Back to Sprints
           </button>
-          <h1 className="text-xl font-bold text-gray-900 dark:text-white mt-4">
+          <h1 className={`text-xl font-bold ${headerTextColor} mt-4`}>
             {sprint.name}
           </h1>
           <div className="flex flex-wrap gap-2 mt-2">
@@ -239,12 +281,24 @@ export default function SprintDetailView({
               {getStatusText(sprint.status)}
             </span>
             {sprint.startDate && (
-              <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded dark:bg-green-900 dark:text-green-300">
+              <span
+                className={`text-xs px-2 py-1 rounded ${
+                  theme === "dark"
+                    ? "bg-green-900 text-green-300"
+                    : "bg-green-100 text-green-800"
+                }`}
+              >
                 Start: {new Date(sprint.startDate).toLocaleDateString()}
               </span>
             )}
             {sprint.endDate && (
-              <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded dark:bg-purple-900 dark:text-purple-300">
+              <span
+                className={`text-xs px-2 py-1 rounded ${
+                  theme === "dark"
+                    ? "bg-purple-900 text-purple-300"
+                    : "bg-purple-100 text-purple-800"
+                }`}
+              >
                 End: {new Date(sprint.endDate).toLocaleDateString()}
               </span>
             )}
@@ -252,18 +306,22 @@ export default function SprintDetailView({
         </div>
 
         <div className="p-4">
-          <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">
+          <h3 className={`text-sm font-medium ${headerTextColor} mb-3`}>
             Filters
           </h3>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label
+                className={`block text-sm font-medium ${filterLabelColor} mb-1`}
+              >
                 Search
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg
-                    className="h-5 w-5 text-gray-400"
+                    className={`h-5 w-5 ${
+                      theme === "dark" ? "text-gray-400" : "text-gray-400"
+                    }`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -279,7 +337,7 @@ export default function SprintDetailView({
                 <input
                   type="text"
                   placeholder="Search tasks..."
-                  className="w-full pl-10 pr-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className={`w-full pl-10 pr-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${inputBgColor} ${inputBorderColor} ${inputTextColor} transition-colors duration-200`}
                   value={localFilters.searchTerm}
                   onChange={(e) =>
                     handleFilterChange("searchTerm", e.target.value)
@@ -289,13 +347,17 @@ export default function SprintDetailView({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label
+                className={`block text-sm font-medium ${filterLabelColor} mb-1`}
+              >
                 Priority
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg
-                    className="h-5 w-5 text-gray-400"
+                    className={`h-5 w-5 ${
+                      theme === "dark" ? "text-gray-400" : "text-gray-400"
+                    }`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -309,7 +371,7 @@ export default function SprintDetailView({
                   </svg>
                 </div>
                 <select
-                  className="w-full pl-10 pr-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className={`w-full pl-10 pr-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${selectBgColor} ${selectBorderColor} ${selectTextColor} transition-colors duration-200`}
                   value={localFilters.priority}
                   onChange={(e) =>
                     handleFilterChange("priority", e.target.value)
@@ -325,13 +387,17 @@ export default function SprintDetailView({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label
+                className={`block text-sm font-medium ${filterLabelColor} mb-1`}
+              >
                 Assignee
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg
-                    className="h-5 w-5 text-gray-400"
+                    className={`h-5 w-5 ${
+                      theme === "dark" ? "text-gray-400" : "text-gray-400"
+                    }`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -345,7 +411,7 @@ export default function SprintDetailView({
                   </svg>
                 </div>
                 <select
-                  className="w-full pl-10 pr-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className={`w-full pl-10 pr-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${selectBgColor} ${selectBorderColor} ${selectTextColor} transition-colors duration-200`}
                   value={localFilters.assignee}
                   onChange={(e) =>
                     handleFilterChange("assignee", e.target.value)
@@ -362,13 +428,17 @@ export default function SprintDetailView({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label
+                className={`block text-sm font-medium ${filterLabelColor} mb-1`}
+              >
                 Module
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg
-                    className="h-5 w-5 text-gray-400"
+                    className={`h-5 w-5 ${
+                      theme === "dark" ? "text-gray-400" : "text-gray-400"
+                    }`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -382,7 +452,7 @@ export default function SprintDetailView({
                   </svg>
                 </div>
                 <select
-                  className="w-full pl-10 pr-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className={`w-full pl-10 pr-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${selectBgColor} ${selectBorderColor} ${selectTextColor} transition-colors duration-200`}
                   value={localFilters.module}
                   onChange={(e) => handleFilterChange("module", e.target.value)}
                 >
@@ -395,13 +465,17 @@ export default function SprintDetailView({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label
+                className={`block text-sm font-medium ${filterLabelColor} mb-1`}
+              >
                 Target
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg
-                    className="h-5 w-5 text-gray-400"
+                    className={`h-5 w-5 ${
+                      theme === "dark" ? "text-gray-400" : "text-gray-400"
+                    }`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -415,7 +489,7 @@ export default function SprintDetailView({
                   </svg>
                 </div>
                 <select
-                  className="w-full pl-10 pr-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className={`w-full pl-10 pr-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${selectBgColor} ${selectBorderColor} ${selectTextColor} transition-colors duration-200`}
                   value={localFilters.target}
                   onChange={(e) => handleFilterChange("target", e.target.value)}
                 >
@@ -430,36 +504,12 @@ export default function SprintDetailView({
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 ml-64">
-        <header className="bg-white dark:bg-gray-800 shadow-sm fixed top-0 left-64 right-0 z-30">
-          <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-              {sprint.name}
-            </h1>
-            <div className="flex items-center space-x-4">
-              <button className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
-                <svg
-                  className="w-5 h-5 text-gray-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  ></path>
-                </svg>
-              </button>
-              <div className="bg-gradient-to-br from-blue-400 to-purple-500 rounded-full w-8 h-8 flex items-center justify-center text-white font-bold">
-                UN
-              </div>
-            </div>
-          </div>
-        </header>
-
-        <div className="p-6 pt-20">
+      <main className="flex-1 ml-64 pt-16">
+        <div
+          className={`p-6 ${
+            theme === "dark" ? "dark:bg-gray-900" : "bg-gray-50"
+          }`}
+        >
           <div className="flex space-x-4 overflow-x-auto">
             {filteredColumns.map((column, index) => (
               <motion.div

@@ -16,7 +16,6 @@ interface CardType {
   timeEstimate?: string;
   module?: string;
   target?: string;
-  imageUrl?: string;
   sprintId?: string;
 }
 
@@ -45,7 +44,6 @@ export default function TaskEditModal({
   const [timeEstimate, setTimeEstimate] = useState("");
   const [module, setModule] = useState("");
   const [target, setTarget] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
 
   useEffect(() => {
     if (task) {
@@ -58,7 +56,6 @@ export default function TaskEditModal({
       setTimeEstimate(task.timeEstimate || "");
       setModule(task.module || "");
       setTarget(task.target || "");
-      setImageUrl(task.imageUrl || "");
     }
   }, [task]);
 
@@ -81,7 +78,6 @@ export default function TaskEditModal({
         timeEstimate: timeEstimate || undefined,
         module: module || undefined,
         target: target || undefined,
-        imageUrl: imageUrl || undefined,
       });
     }
   };
@@ -265,39 +261,7 @@ export default function TaskEditModal({
                       <option value="Mobile">Mobile</option>
                     </select>
                   </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Image URL (Optional)
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="https://example.com/image.png"
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                      value={imageUrl}
-                      onChange={(e) => setImageUrl(e.target.value)}
-                    />
-                  </div>
                 </div>
-
-                {imageUrl && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Preview
-                    </label>
-                    <div className="border border-gray-300 rounded-md overflow-hidden">
-                      <img
-                        src={imageUrl}
-                        alt="Task preview"
-                        className="w-full h-32 object-cover"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = "none";
-                        }}
-                      />
-                    </div>
-                  </div>
-                )}
               </div>
 
               <div className="mt-6 flex justify-end space-x-3">

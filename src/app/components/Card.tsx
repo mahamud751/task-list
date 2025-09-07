@@ -79,11 +79,26 @@ export default function Card({
     }
   };
 
+  const getPriorityGlow = (priority: string) => {
+    switch (priority) {
+      case "critical":
+        return "shadow-[0_0_15px_rgba(239,68,68,0.3)]";
+      case "high":
+        return "shadow-[0_0_15px_rgba(249,115,22,0.3)]";
+      case "medium":
+        return "shadow-[0_0_15px_rgba(234,179,8,0.3)]";
+      case "low":
+        return "shadow-[0_0_15px_rgba(34,197,94,0.3)]";
+      default:
+        return "";
+    }
+  };
+
   return (
     <motion.div
       ref={canDrag ? drag : null} // Only attach drag ref if user can drag
       onClick={onClick}
-      className={`bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-3 transition-all duration-300 transform card-hover border-l-4 ${
+      className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 mb-3 transition-all duration-300 transform card-hover border-l-4 ${
         priority === "critical"
           ? "border-red-500"
           : priority === "high"
@@ -95,10 +110,18 @@ export default function Card({
           : "border-gray-500"
       } ${
         canDrag
-          ? "cursor-move hover:cursor-pointer hover:shadow-lg"
+          ? "cursor-move hover:cursor-pointer hover:shadow-xl"
           : "cursor-default"
-      }`}
-      whileHover={canDrag ? { y: -2 } : {}}
+      } ${getPriorityGlow(priority)}`}
+      whileHover={
+        canDrag
+          ? {
+              y: -5,
+              boxShadow:
+                "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+            }
+          : {}
+      }
       whileTap={canDrag ? { scale: 0.98 } : {}}
       animate={{
         opacity: isDragging ? 0.5 : 1,
@@ -118,14 +141,14 @@ export default function Card({
             </h3>
           </div>
           {(module || target) && (
-            <div className="flex flex-wrap gap-1 mt-1">
+            <div className="flex flex-wrap gap-1 mt-2">
               {module && (
-                <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full dark:bg-blue-900 dark:text-blue-300">
+                <span className="text-xs px-2 py-1 bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 rounded-full dark:from-blue-900 dark:to-indigo-900 dark:text-blue-300">
                   {module}
                 </span>
               )}
               {target && (
-                <span className="text-xs px-2 py-1 bg-purple-100 text-purple-800 rounded-full dark:bg-purple-900 dark:text-purple-300">
+                <span className="text-xs px-2 py-1 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 rounded-full dark:from-purple-900 dark:to-pink-900 dark:text-purple-300">
                   {target}
                 </span>
               )}
@@ -134,33 +157,21 @@ export default function Card({
         </div>
         <div className="flex items-center space-x-2">
           {storyPoints && (
-            <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full dark:bg-blue-900 dark:text-blue-300">
+            <span className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-xs font-medium px-2 py-1 rounded-full shadow">
               {storyPoints} pts
             </span>
           )}
           <span
-            className={`w-3 h-3 rounded-full ${getPriorityColor(priority)}`}
+            className={`w-3 h-3 rounded-full ${getPriorityColor(
+              priority
+            )} shadow-sm`}
           ></span>
         </div>
       </div>
 
-      <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-2">
+      <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-2 mt-2">
         {description}
       </p>
-
-      {imageUrl && (
-        <div className="mb-3 rounded-md overflow-hidden">
-          <img
-            src={imageUrl}
-            alt="Task attachment"
-            className="w-full h-24 object-cover"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.style.display = "none";
-            }}
-          />
-        </div>
-      )}
 
       {progress !== undefined && (
         <div className="mb-3">
@@ -168,9 +179,9 @@ export default function Card({
             <span>Progress</span>
             <span>{progress}%</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
+          <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
             <motion.div
-              className="bg-blue-600 h-2 rounded-full"
+              className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2.5 rounded-full"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.5, ease: "easeOut" }}
@@ -179,22 +190,22 @@ export default function Card({
         </div>
       )}
 
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
         <div className="flex space-x-2">
           {assignee ? (
             <div className="flex -space-x-2">
-              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
+              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold shadow-sm">
                 {assignee.charAt(0).toUpperCase()}
               </div>
             </div>
           ) : (
-            <div className="bg-gray-200 border-2 border-dashed rounded-full w-6 h-6" />
+            <div className="bg-gray-200 border-2 border-dashed rounded-full w-7 h-7 dark:bg-gray-700" />
           )}
         </div>
 
         <div className="flex space-x-3">
           {timeEstimate && (
-            <div className="flex items-center text-xs text-gray-500">
+            <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
               <svg
                 className="w-4 h-4 mr-1"
                 fill="none"
@@ -211,7 +222,7 @@ export default function Card({
               <span>{timeEstimate}</span>
             </div>
           )}
-          <div className="flex items-center text-xs text-gray-500">
+          <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
             <svg
               className="w-4 h-4 mr-1"
               fill="none"

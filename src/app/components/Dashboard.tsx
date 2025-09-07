@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useDatabase } from "./DatabaseProvider";
 import { motion } from "framer-motion";
 import SprintSelector from "./SprintSelector";
+import { useTheme } from "./ThemeProvider";
 
 interface FilterOptions {
   searchTerm: string;
@@ -15,6 +16,7 @@ interface FilterOptions {
 
 export default function Dashboard({ filters }: { filters: FilterOptions }) {
   const { sprints, currentSprint, refreshSprints } = useDatabase();
+  const { theme } = useTheme();
   const [stats, setStats] = useState({
     totalTasks: 0,
     completedTasks: 0,
@@ -101,13 +103,13 @@ export default function Dashboard({ filters }: { filters: FilterOptions }) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
-        return "bg-green-500";
+        return "bg-gradient-to-r from-green-500 to-emerald-500";
       case "completed":
-        return "bg-blue-500";
+        return "bg-gradient-to-r from-blue-500 to-indigo-500";
       case "planned":
-        return "bg-yellow-500";
+        return "bg-gradient-to-r from-yellow-500 to-amber-500";
       default:
-        return "bg-gray-500";
+        return "bg-gradient-to-r from-gray-500 to-gray-600";
     }
   };
 
@@ -124,12 +126,28 @@ export default function Dashboard({ filters }: { filters: FilterOptions }) {
     }
   };
 
+  // Theme-based colors
+  const headerTextColor = theme === "dark" ? "text-white" : "text-gray-900";
+  const subheaderTextColor =
+    theme === "dark" ? "text-gray-400" : "text-gray-600";
+  const cardBgColor = theme === "dark" ? "dark:bg-gray-800" : "bg-white";
+  const cardBorderColor =
+    theme === "dark" ? "dark:border-gray-700" : "border-gray-200";
+  const statLabelColor = theme === "dark" ? "text-gray-400" : "text-gray-500";
+  const statValueColor = theme === "dark" ? "text-white" : "text-gray-900";
+  const progressBarBgColor =
+    theme === "dark" ? "dark:bg-gray-700" : "bg-gray-200";
+
   return (
-    <div className="p-6 pt-20">
+    <div
+      className={`p-6 pt-20 ${
+        theme === "dark" ? "dark:bg-gray-900" : "bg-gray-50"
+      }`}
+    >
       <div className="mb-6">
         <div className="flex justify-between items-center">
           <motion.h1
-            className="text-2xl font-bold text-gray-900 dark:text-white"
+            className={`text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent`}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
@@ -141,7 +159,7 @@ export default function Dashboard({ filters }: { filters: FilterOptions }) {
           </div>
         </div>
         <motion.p
-          className="text-gray-600 dark:text-gray-400 mt-2"
+          className={`mt-2 ${subheaderTextColor}`}
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
@@ -159,11 +177,14 @@ export default function Dashboard({ filters }: { filters: FilterOptions }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <motion.div
+          className={`${cardBgColor} rounded-xl shadow-lg p-6 ${cardBorderColor} border transition-all duration-300 hover:shadow-xl`}
+          whileHover={{ y: -5 }}
+        >
           <div className="flex items-center">
-            <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900">
+            <div className="p-3 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 shadow-md">
               <svg
-                className="w-6 h-6 text-blue-600 dark:text-blue-400"
+                className="w-6 h-6 text-white"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -177,21 +198,24 @@ export default function Dashboard({ filters }: { filters: FilterOptions }) {
               </svg>
             </div>
             <div className="ml-4">
-              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              <h3 className={`text-sm font-medium ${statLabelColor}`}>
                 Total Tasks
               </h3>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className={`text-2xl font-bold ${statValueColor}`}>
                 {stats.totalTasks}
               </p>
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <motion.div
+          className={`${cardBgColor} rounded-xl shadow-lg p-6 ${cardBorderColor} border transition-all duration-300 hover:shadow-xl`}
+          whileHover={{ y: -5 }}
+        >
           <div className="flex items-center">
-            <div className="p-3 rounded-full bg-green-100 dark:bg-green-900">
+            <div className="p-3 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 shadow-md">
               <svg
-                className="w-6 h-6 text-green-600 dark:text-green-400"
+                className="w-6 h-6 text-white"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -205,21 +229,24 @@ export default function Dashboard({ filters }: { filters: FilterOptions }) {
               </svg>
             </div>
             <div className="ml-4">
-              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              <h3 className={`text-sm font-medium ${statLabelColor}`}>
                 Completed
               </h3>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className={`text-2xl font-bold ${statValueColor}`}>
                 {stats.completedTasks}
               </p>
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <motion.div
+          className={`${cardBgColor} rounded-xl shadow-lg p-6 ${cardBorderColor} border transition-all duration-300 hover:shadow-xl`}
+          whileHover={{ y: -5 }}
+        >
           <div className="flex items-center">
-            <div className="p-3 rounded-full bg-yellow-100 dark:bg-yellow-900">
+            <div className="p-3 rounded-full bg-gradient-to-r from-yellow-500 to-amber-500 shadow-md">
               <svg
-                className="w-6 h-6 text-yellow-600 dark:text-yellow-400"
+                className="w-6 h-6 text-white"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -233,21 +260,24 @@ export default function Dashboard({ filters }: { filters: FilterOptions }) {
               </svg>
             </div>
             <div className="ml-4">
-              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              <h3 className={`text-sm font-medium ${statLabelColor}`}>
                 In Progress
               </h3>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className={`text-2xl font-bold ${statValueColor}`}>
                 {stats.inProgressTasks}
               </p>
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <motion.div
+          className={`${cardBgColor} rounded-xl shadow-lg p-6 ${cardBorderColor} border transition-all duration-300 hover:shadow-xl`}
+          whileHover={{ y: -5 }}
+        >
           <div className="flex items-center">
-            <div className="p-3 rounded-full bg-gray-100 dark:bg-gray-700">
+            <div className="p-3 rounded-full bg-gradient-to-r from-gray-500 to-gray-600 shadow-md">
               <svg
-                className="w-6 h-6 text-gray-600 dark:text-gray-400"
+                className="w-6 h-6 text-white"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -261,15 +291,13 @@ export default function Dashboard({ filters }: { filters: FilterOptions }) {
               </svg>
             </div>
             <div className="ml-4">
-              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                To Do
-              </h3>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <h3 className={`text-sm font-medium ${statLabelColor}`}>To Do</h3>
+              <p className={`text-2xl font-bold ${statValueColor}`}>
                 {stats.todoTasks}
               </p>
             </div>
           </div>
-        </div>
+        </motion.div>
       </motion.div>
 
       {/* Sprints Overview */}
@@ -278,50 +306,68 @@ export default function Dashboard({ filters }: { filters: FilterOptions }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.3 }}
       >
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+        <h2
+          className={`text-2xl font-bold ${headerTextColor} mb-4 flex items-center`}
+        >
           Sprints
+          <span className="ml-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-sm font-normal px-2 py-1 rounded-full">
+            {sprints.length}
+          </span>
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {sprints.map((sprint, index) => (
             <motion.div
               key={sprint.id}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow p-6"
+              className={`${cardBgColor} rounded-xl shadow-lg p-6 ${cardBorderColor} border transition-all duration-300 hover:shadow-xl cursor-pointer`}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: 0.1 * index }}
+              whileHover={{ y: -10 }}
+              onClick={() => console.log("Navigate to sprint:", sprint.id)}
             >
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                  <h3 className={`text-lg font-bold ${headerTextColor}`}>
                     {sprint.name}
                   </h3>
                   {sprint.description && (
-                    <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
+                    <p
+                      className={`text-sm mt-1 line-clamp-2 ${
+                        theme === "dark" ? "text-gray-400" : "text-gray-600"
+                      }`}
+                    >
                       {sprint.description}
                     </p>
                   )}
                 </div>
                 <span
-                  className={`text-xs px-2 py-1 rounded-full ${getStatusColor(
+                  className={`text-xs px-3 py-1 rounded-full ${getStatusColor(
                     sprint.status
-                  )} text-white`}
+                  )} text-white shadow-sm`}
                 >
                   {getStatusText(sprint.status)}
                 </span>
               </div>
 
               <div className="mt-4">
-                <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-1">
+                <div
+                  className={`flex justify-between text-sm mb-1 ${
+                    theme === "dark" ? "text-gray-400" : "text-gray-500"
+                  }`}
+                >
                   <span>Progress</span>
                   <span>
                     {sprint.tasks.filter((t: any) => t.progress === 100).length}{" "}
                     / {sprint.tasks.length} completed
                   </span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
-                  <div
-                    className="bg-blue-600 h-2 rounded-full"
-                    style={{
+                <div
+                  className={`w-full rounded-full h-2.5 ${progressBarBgColor}`}
+                >
+                  <motion.div
+                    className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2.5 rounded-full"
+                    initial={{ width: 0 }}
+                    animate={{
                       width:
                         sprint.tasks.length > 0
                           ? `${
@@ -333,24 +379,41 @@ export default function Dashboard({ filters }: { filters: FilterOptions }) {
                             }%`
                           : "0%",
                     }}
-                  ></div>
+                    transition={{ duration: 1, ease: "easeOut" }}
+                  ></motion.div>
                 </div>
               </div>
 
               <div className="mt-4 flex flex-wrap gap-2">
                 {sprint.startDate && (
-                  <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded dark:bg-green-900 dark:text-green-300">
+                  <span
+                    className={`text-xs px-2 py-1 rounded-full ${
+                      theme === "dark"
+                        ? "bg-green-900/30 text-green-300"
+                        : "bg-green-100 text-green-800"
+                    }`}
+                  >
                     Start: {new Date(sprint.startDate).toLocaleDateString()}
                   </span>
                 )}
                 {sprint.endDate && (
-                  <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded dark:bg-purple-900 dark:text-purple-300">
+                  <span
+                    className={`text-xs px-2 py-1 rounded-full ${
+                      theme === "dark"
+                        ? "bg-purple-900/30 text-purple-300"
+                        : "bg-purple-100 text-purple-800"
+                    }`}
+                  >
                     End: {new Date(sprint.endDate).toLocaleDateString()}
                   </span>
                 )}
               </div>
 
-              <div className="mt-4 text-sm text-gray-500 dark:text-gray-400">
+              <div
+                className={`mt-4 text-sm ${
+                  theme === "dark" ? "text-gray-400" : "text-gray-500"
+                }`}
+              >
                 {sprint.tasks.length} tasks
               </div>
             </motion.div>

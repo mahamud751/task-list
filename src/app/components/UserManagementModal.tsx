@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { userService, User } from "../../services/userService";
+import { useTheme } from "./ThemeProvider";
 
 interface UserManagementModalProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ export default function UserManagementModal({
   onClose,
   currentUser,
 }: UserManagementModalProps) {
+  const { theme } = useTheme();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -25,6 +27,24 @@ export default function UserManagementModal({
     role: "developer",
   });
   const [editingUser, setEditingUser] = useState<User | null>(null);
+
+  // Theme-based colors
+  const backgroundColor = theme === "dark" ? "dark:bg-gray-800" : "bg-white";
+  const textColor = theme === "dark" ? "dark:text-white" : "text-gray-900";
+  const secondaryTextColor =
+    theme === "dark" ? "dark:text-gray-300" : "text-gray-700";
+  const inputBgColor = theme === "dark" ? "dark:bg-gray-700" : "";
+  const inputBorderColor =
+    theme === "dark" ? "dark:border-gray-600" : "border-gray-300";
+  const inputTextColor = theme === "dark" ? "dark:text-white" : "";
+  const errorBgColor = theme === "dark" ? "bg-red-900" : "bg-red-100";
+  const errorTextColor = theme === "dark" ? "text-red-200" : "text-red-700";
+  const dividerColor =
+    theme === "dark" ? "dark:border-gray-700" : "border-gray-200";
+  const closeButtonColor =
+    theme === "dark"
+      ? "dark:text-gray-400 dark:hover:text-gray-200"
+      : "text-gray-500 hover:text-gray-700";
 
   // Fetch all users
   useEffect(() => {
@@ -104,20 +124,19 @@ export default function UserManagementModal({
           onClick={onClose}
         >
           <motion.div
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+            className={`rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto ${backgroundColor}`}
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+            <div
+              className={`px-6 py-4 border-b ${dividerColor} flex justify-between items-center`}
+            >
+              <h2 className={`text-xl font-bold ${textColor}`}>
                 User Management
               </h2>
-              <button
-                onClick={onClose}
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-              >
+              <button onClick={onClose} className={closeButtonColor}>
                 <svg
                   className="w-6 h-6"
                   fill="none"
@@ -136,14 +155,16 @@ export default function UserManagementModal({
 
             <div className="p-6">
               {error && (
-                <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
+                <div
+                  className={`mb-4 p-3 ${errorBgColor} ${errorTextColor} rounded-md`}
+                >
                   {error}
                 </div>
               )}
 
               {/* Create User Form */}
               <div className="mb-8">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                <h3 className={`text-lg font-medium ${textColor} mb-4`}>
                   Create New User
                 </h3>
                 <form
@@ -151,13 +172,15 @@ export default function UserManagementModal({
                   className="grid grid-cols-1 md:grid-cols-2 gap-4"
                 >
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label
+                      className={`block text-sm font-medium ${secondaryTextColor} mb-1`}
+                    >
                       Name
                     </label>
                     <input
                       type="text"
                       required
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      className={`w-full px-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${inputBgColor} ${inputBorderColor} ${inputTextColor}`}
                       value={newUser.name}
                       onChange={(e) =>
                         setNewUser({ ...newUser, name: e.target.value })
@@ -166,13 +189,15 @@ export default function UserManagementModal({
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label
+                      className={`block text-sm font-medium ${secondaryTextColor} mb-1`}
+                    >
                       Email
                     </label>
                     <input
                       type="email"
                       required
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      className={`w-full px-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${inputBgColor} ${inputBorderColor} ${inputTextColor}`}
                       value={newUser.email}
                       onChange={(e) =>
                         setNewUser({ ...newUser, email: e.target.value })
@@ -181,13 +206,15 @@ export default function UserManagementModal({
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label
+                      className={`block text-sm font-medium ${secondaryTextColor} mb-1`}
+                    >
                       Password
                     </label>
                     <input
                       type="password"
                       required
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      className={`w-full px-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${inputBgColor} ${inputBorderColor} ${inputTextColor}`}
                       value={newUser.password}
                       onChange={(e) =>
                         setNewUser({ ...newUser, password: e.target.value })
@@ -196,11 +223,13 @@ export default function UserManagementModal({
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label
+                      className={`block text-sm font-medium ${secondaryTextColor} mb-1`}
+                    >
                       Role
                     </label>
                     <select
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      className={`w-full px-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${inputBgColor} ${inputBorderColor} ${inputTextColor}`}
                       value={newUser.role}
                       onChange={(e) =>
                         setNewUser({ ...newUser, role: e.target.value })
@@ -225,7 +254,7 @@ export default function UserManagementModal({
 
               {/* Users List */}
               <div>
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                <h3 className={`text-lg font-medium ${textColor} mb-4`}>
                   Existing Users
                 </h3>
 
