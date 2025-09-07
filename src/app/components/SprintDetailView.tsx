@@ -9,6 +9,7 @@ import TaskModal from "./TaskModal";
 import TaskEditModal from "./TaskEditModal";
 import TopNavbar from "./TopNavbar";
 import { useTheme } from "./ThemeProvider";
+import { SprintType } from "../../services/sprintService";
 
 interface CardType {
   id: string;
@@ -42,22 +43,14 @@ export default function SprintDetailView({
   activeView,
   onViewChange,
 }: {
-  sprint: any;
+  sprint: SprintType;
   onBack: () => void;
   onFilterChange: (filters: FilterOptions) => void;
   filters: FilterOptions;
   activeView: string;
   onViewChange: (view: string) => void;
 }) {
-  const {
-    columns,
-    moveCard,
-    addCard,
-    updateCard,
-    refreshData,
-    hasPermission,
-    users,
-  } = useDatabase();
+  const { columns, moveCard, addCard, updateCard, users } = useDatabase();
   const { theme } = useTheme();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -80,9 +73,10 @@ export default function SprintDetailView({
           card.title
             .toLowerCase()
             .includes(localFilters.searchTerm.toLowerCase()) ||
-          card.taskId
-            .toLowerCase()
-            .includes(localFilters.searchTerm.toLowerCase()) ||
+          (card.taskId &&
+            card.taskId
+              .toLowerCase()
+              .includes(localFilters.searchTerm.toLowerCase())) ||
           (card.description &&
             card.description
               .toLowerCase()
@@ -521,7 +515,10 @@ export default function SprintDetailView({
                 <Column
                   id={column.id}
                   title={column.title}
-                  cards={column.cards}
+                  cards={column.cards.map((card) => ({
+                    ...card,
+                    taskId: card.taskId || `TASK-${card.id}`,
+                  }))}
                   moveCard={moveCard}
                   onCardClick={handleCardClick}
                 />

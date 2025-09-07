@@ -8,7 +8,12 @@ import { useTheme } from "./ThemeProvider";
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onLogin: (user: any) => void;
+  onLogin: (user: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+  }) => void;
 }
 
 export default function LoginModal({
@@ -188,7 +193,7 @@ export default function LoginModal({
                   theme === "dark" ? "text-gray-400" : "text-gray-600"
                 }`}
               >
-                Don't have an account?{" "}
+                Don&apos;t have an account?{" "}
                 <a href="#" className={`font-medium ${linkColor}`}>
                   Sign up
                 </a>

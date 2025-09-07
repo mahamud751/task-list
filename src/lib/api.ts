@@ -32,7 +32,28 @@ export async function fetchTasks() {
   return response.json();
 }
 
-export async function createTask(data: any) {
+interface CardType {
+  id: string;
+  taskId?: string;
+  title: string;
+  description: string;
+  priority: string;
+  storyPoints?: number;
+  assignee?: string;
+  assigneeId?: string; // Add assigneeId property
+  progress?: number;
+  timeEstimate?: string;
+  module?: string;
+  target?: string;
+  imageUrl?: string;
+  sprintId?: string;
+  columnId?: string; // Add columnId property
+  order?: number;
+  startDate?: string;
+  dueDate?: string;
+}
+
+export async function createTask(data: Omit<CardType, "id">) {
   const response = await fetch(`${API_BASE_URL}/tasks`, {
     method: "POST",
     headers: {

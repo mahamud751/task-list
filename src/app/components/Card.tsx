@@ -1,9 +1,9 @@
 "use client";
 
-import { useDrag } from "react-dnd";
 import { motion } from "framer-motion";
-import { useDatabase } from "./DatabaseProvider";
 import { useRef } from "react";
+import { useDrag } from "react-dnd";
+import { useDatabase } from "./DatabaseProvider";
 
 interface CardProps {
   id: string;
@@ -35,7 +35,6 @@ export default function Card({
   timeEstimate,
   module,
   target,
-  imageUrl,
   onClick,
 }: CardProps) {
   const { hasPermission } = useDatabase();
@@ -68,21 +67,6 @@ export default function Card({
         return "bg-green-500";
       default:
         return "bg-gray-500";
-    }
-  };
-
-  const getPriorityTextColor = (priority: string) => {
-    switch (priority) {
-      case "critical":
-        return "text-red-700 dark:text-red-300";
-      case "high":
-        return "text-orange-700 dark:text-orange-300";
-      case "medium":
-        return "text-yellow-700 dark:text-yellow-300";
-      case "low":
-        return "text-green-700 dark:text-green-300";
-      default:
-        return "text-gray-700 dark:text-gray-300";
     }
   };
 

@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { useDatabase } from "./DatabaseProvider";
 import Column from "./Column";
+import { motion } from "framer-motion";
 import FloatingActionButton from "./FloatingActionButton";
 import TaskModal from "./TaskModal";
 import SprintCreateModal from "./SprintCreateModal";
-import { motion } from "framer-motion";
+import { SprintType } from "./DatabaseProvider";
 import { useTheme } from "./ThemeProvider";
 
 export default function Board() {
@@ -45,7 +46,19 @@ export default function Board() {
     endDate?: string;
     status?: string;
   }) => {
-    addSprint(sprint);
+    // Provide a default status if not provided and convert string dates to Date objects
+    const sprintData: Omit<
+      SprintType,
+      "id" | "createdAt" | "updatedAt" | "tasks"
+    > = {
+      name: sprint.name,
+      description: sprint.description,
+      status: sprint.status || "planned", // Default to "planned" status
+      ...(sprint.startDate && { startDate: new Date(sprint.startDate) }),
+      ...(sprint.endDate && { endDate: new Date(sprint.endDate) }),
+    };
+
+    addSprint(sprintData);
     setIsSprintModalOpen(false);
   };
 
@@ -86,7 +99,14 @@ export default function Board() {
             transition={{ duration: 0.3 }}
             className="flex-shrink-0 w-80"
           >
-            <Column id={column.id} title={column.title} cards={column.cards} />
+            <Column
+              id={column.id}
+              title={column.title}
+              cards={column.cards.map((card) => ({
+                ...card,
+                taskId: card.taskId || `TASK-${card.id}`,
+              }))}
+            />
           </motion.div>
         ))}
       </div>

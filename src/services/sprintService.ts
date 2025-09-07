@@ -7,7 +7,35 @@ export interface SprintType {
   startDate?: Date;
   endDate?: Date;
   status: string;
-  tasks: any[];
+  tasks: Array<{
+    id: string;
+    taskId: string;
+    title: string;
+    description: string;
+    priority: string;
+    storyPoints?: number;
+    progress?: number;
+    timeEstimate?: string;
+    module?: string;
+    target?: string;
+    imageUrl?: string;
+    sprintId?: string;
+    columnId: string;
+    order?: number;
+    startDate?: Date;
+    dueDate?: Date;
+    assignee?: {
+      id: string;
+      name: string;
+      email: string;
+      role: string;
+    };
+    column: {
+      id: string;
+      title: string;
+    };
+    sprint?: SprintType;
+  }>;
   createdAt: Date;
   updatedAt: Date;
 }

@@ -1,7 +1,3 @@
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
-
 // Note: This service should primarily be used on the server side
 // For client-side operations, use API calls instead
 

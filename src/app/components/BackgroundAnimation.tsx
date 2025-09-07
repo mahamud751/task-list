@@ -3,6 +3,37 @@
 import { useEffect, useRef } from "react";
 import { useTheme } from "./ThemeProvider";
 
+// Define interfaces for the different bubble types
+interface Bubble {
+  x: number;
+  y: number;
+  radius: number;
+  speed: number;
+  opacity: number;
+  color: string;
+}
+
+interface ColorfulBubble {
+  x: number;
+  y: number;
+  radius: number;
+  speedX: number;
+  speedY: number;
+  opacity: number;
+  color: string;
+  pulseDirection: number;
+  pulseSpeed: number;
+}
+
+interface Star {
+  x: number;
+  y: number;
+  size: number;
+  opacity: number;
+  blinkSpeed: number;
+  angle: number;
+}
+
 export default function BackgroundAnimation() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { theme } = useTheme();
@@ -24,9 +55,9 @@ export default function BackgroundAnimation() {
     window.addEventListener("resize", resizeCanvas);
 
     // Bubble particles
-    const bubbles: any[] = [];
-    const stars: any[] = [];
-    const colorfulBubbles: any[] = [];
+    const bubbles: Bubble[] = [];
+    const stars: Star[] = [];
+    const colorfulBubbles: ColorfulBubble[] = [];
 
     // Create regular bubbles
     for (let i = 0; i < 20; i++) {

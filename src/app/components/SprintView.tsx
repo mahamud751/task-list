@@ -49,14 +49,11 @@ export default function SprintView({ filters }: { filters: FilterOptions }) {
 
   // Apply filters whenever columns or filters change
   useEffect(() => {
-    if (!currentSprint) {
-      setFilteredColumns([]);
-      return;
-    }
+    if (!columns || !currentSprint) return;
 
     const filtered = columns.map((column) => {
       const filteredCards = column.cards.filter((card) => {
-        // Check if card belongs to current sprint
+        // Sprint filter - only show tasks belonging to current sprint
         if (card.sprintId !== currentSprint.id) {
           return false;
         }
@@ -65,9 +62,10 @@ export default function SprintView({ filters }: { filters: FilterOptions }) {
         const matchesSearch =
           filters.searchTerm === "" ||
           card.title.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
-          card.taskId
-            .toLowerCase()
-            .includes(filters.searchTerm.toLowerCase()) ||
+          (card.taskId &&
+            card.taskId
+              .toLowerCase()
+              .includes(filters.searchTerm.toLowerCase())) ||
           (card.description &&
             card.description
               .toLowerCase()
@@ -106,9 +104,15 @@ export default function SprintView({ filters }: { filters: FilterOptions }) {
         );
       });
 
+      // Ensure all cards have a taskId
+      const cardsWithTaskId = filteredCards.map((card) => ({
+        ...card,
+        taskId: card.taskId || `TASK-${card.id}`,
+      }));
+
       return {
         ...column,
-        cards: filteredCards,
+        cards: cardsWithTaskId,
       };
     });
 
@@ -248,7 +252,10 @@ export default function SprintView({ filters }: { filters: FilterOptions }) {
             <Column
               id={column.id}
               title={column.title}
-              cards={column.cards}
+              cards={column.cards.map((card) => ({
+                ...card,
+                taskId: card.taskId || `TASK-${card.id}`,
+              }))}
               moveCard={moveCard}
               onCardClick={handleCardClick}
             />

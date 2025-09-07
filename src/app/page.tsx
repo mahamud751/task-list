@@ -1,17 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { DatabaseProvider, useDatabase } from "./components/DatabaseProvider";
-import SprintListView from "./components/SprintListView";
-import SprintDetailView from "./components/SprintDetailView";
-import TimelineView from "./components/TimelineView";
+import { useEffect, useState } from "react";
+import { User } from "../services/userService";
+import {
+  DatabaseProvider,
+  useDatabase,
+  SprintType,
+} from "./components/DatabaseProvider";
 import DndProvider from "./components/DndProvider";
 import LoginModal from "./components/LoginModal";
-import UserManagementModal from "./components/UserManagementModal";
-import { motion } from "framer-motion";
-import { User } from "../services/userService";
 import Sidebar from "./components/Sidebar";
+import SprintDetailView from "./components/SprintDetailView";
+import SprintListView from "./components/SprintListView";
+import TimelineView from "./components/TimelineView";
 import TopNavbar from "./components/TopNavbar";
+import UserManagementModal from "./components/UserManagementModal";
 
 interface FilterOptions {
   searchTerm: string;
@@ -21,10 +24,27 @@ interface FilterOptions {
   target: string;
 }
 
+interface TimelineTaskType {
+  id: string;
+  taskId?: string;
+  title: string;
+  description: string;
+  priority: string;
+  storyPoints?: number;
+  assignee?: string;
+  progress?: number;
+  timeEstimate?: string;
+  startDate: string;
+  dueDate: string;
+  columnId: string;
+  module?: string;
+  target?: string;
+}
+
 function HomeContent() {
-  const { currentUser, setCurrentUser, logout, columns } = useDatabase();
+  const { currentUser, setCurrentUser, columns } = useDatabase();
   const [activeView, setActiveView] = useState("sprints"); // Changed default to sprints
-  const [selectedSprint, setSelectedSprint] = useState<any | null>(null);
+  const [selectedSprint, setSelectedSprint] = useState<SprintType | null>(null);
   const [filters, setFilters] = useState<FilterOptions>({
     searchTerm: "",
     priority: "all",
@@ -44,21 +64,24 @@ function HomeContent() {
     }
   }, [currentUser]);
 
-  const handleLogin = (user: User) => {
-    setCurrentUser(user);
+  const handleLogin = (user: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+  }) => {
+    setCurrentUser({
+      ...user,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
     setIsLoggedIn(true);
     setIsLoginModalOpen(false);
   };
 
-  const handleLogout = () => {
-    logout();
-    setIsLoggedIn(false);
-    setIsLoginModalOpen(true);
-  };
-
   // Extract all tasks from columns to create timeline data
-  const getAllTasksFromColumns = () => {
-    const allTasks: any[] = [];
+  const getAllTasksFromColumns = (): TimelineTaskType[] => {
+    const allTasks: TimelineTaskType[] = [];
 
     columns.forEach((column) => {
       column.cards.forEach((card) => {
@@ -105,8 +128,6 @@ function HomeContent() {
         {activeView === "sprints" && !selectedSprint && (
           <SprintListView
             onSprintSelect={setSelectedSprint}
-            onViewChange={setActiveView}
-            onFilterChange={setFilters}
             filters={filters}
           />
         )}

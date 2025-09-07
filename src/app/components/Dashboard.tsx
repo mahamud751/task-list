@@ -5,6 +5,7 @@ import { useDatabase } from "./DatabaseProvider";
 import { motion } from "framer-motion";
 import SprintSelector from "./SprintSelector";
 import { useTheme } from "./ThemeProvider";
+import { TaskApiType, SprintType } from "./DatabaseProvider";
 
 interface FilterOptions {
   searchTerm: string;
@@ -15,7 +16,7 @@ interface FilterOptions {
 }
 
 export default function Dashboard({ filters }: { filters: FilterOptions }) {
-  const { sprints, currentSprint, refreshSprints } = useDatabase();
+  const { sprints, currentSprint } = useDatabase();
   const { theme } = useTheme();
   const [stats, setStats] = useState({
     totalTasks: 0,
@@ -36,8 +37,9 @@ export default function Dashboard({ filters }: { filters: FilterOptions }) {
         ? [sprints.find((s) => s.id === currentSprint.id)].filter(Boolean)
         : sprints;
 
-      sprintsToCalculate.forEach((sprint) => {
-        sprint.tasks.forEach((task: any) => {
+      sprintsToCalculate.forEach((sprint: SprintType | undefined) => {
+        if (!sprint) return; // Handle undefined sprint
+        sprint.tasks.forEach((task: TaskApiType) => {
           // Apply filters
           const matchesSearch =
             filters.searchTerm === "" ||
@@ -82,7 +84,8 @@ export default function Dashboard({ filters }: { filters: FilterOptions }) {
             total++;
             if (task.progress === 100) {
               completed++;
-            } else if (task.progress > 0) {
+            } else if (task.progress && task.progress > 0) {
+              // Handle undefined progress
               inProgress++;
             } else {
               todo++;
@@ -357,7 +360,11 @@ export default function Dashboard({ filters }: { filters: FilterOptions }) {
                 >
                   <span>Progress</span>
                   <span>
-                    {sprint.tasks.filter((t: any) => t.progress === 100).length}{" "}
+                    {
+                      sprint.tasks.filter(
+                        (t: TaskApiType) => t.progress === 100
+                      ).length
+                    }{" "}
                     / {sprint.tasks.length} completed
                   </span>
                 </div>
@@ -372,7 +379,7 @@ export default function Dashboard({ filters }: { filters: FilterOptions }) {
                         sprint.tasks.length > 0
                           ? `${
                               (sprint.tasks.filter(
-                                (t: any) => t.progress === 100
+                                (t: TaskApiType) => t.progress === 100
                               ).length /
                                 sprint.tasks.length) *
                               100

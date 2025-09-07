@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useDatabase } from "./DatabaseProvider";
 import { motion } from "framer-motion";
 import FloatingActionButton from "./FloatingActionButton";
 import SprintCreateModal from "./SprintCreateModal";
-import { useDatabase } from "./DatabaseProvider";
 import { useTheme } from "./ThemeProvider";
+import { SprintType } from "../../services/sprintService";
 
 interface FilterOptions {
   searchTerm: string;
@@ -17,11 +18,11 @@ interface FilterOptions {
 
 export default function SprintListView({
   onSprintSelect,
-  onFilterChange,
+
   filters,
 }: {
-  onSprintSelect: (sprint: any) => void;
-  onFilterChange: (filters: FilterOptions) => void;
+  onSprintSelect: (sprint: SprintType) => void;
+
   filters: FilterOptions;
 }) {
   const { sprints, addSprint } = useDatabase();
@@ -44,12 +45,24 @@ export default function SprintListView({
 
   const handleCreateSprint = (sprint: {
     name: string;
-    description: string;
+    description?: string;
     startDate?: string;
     endDate?: string;
     status?: string;
   }) => {
-    addSprint(sprint);
+    // Provide a default status if not provided and convert string dates to Date objects
+    const sprintData: Omit<
+      SprintType,
+      "id" | "createdAt" | "updatedAt" | "tasks"
+    > = {
+      name: sprint.name,
+      description: sprint.description,
+      status: sprint.status || "planned", // Default to "planned" status
+      ...(sprint.startDate && { startDate: new Date(sprint.startDate) }),
+      ...(sprint.endDate && { endDate: new Date(sprint.endDate) }),
+    };
+
+    addSprint(sprintData);
     setIsCreateModalOpen(false);
   };
 
@@ -86,7 +99,6 @@ export default function SprintListView({
     theme === "dark" ? "dark:border-gray-700" : "border-gray-200";
   const descriptionTextColor =
     theme === "dark" ? "text-gray-300" : "text-gray-600";
-  const dateTextColor = theme === "dark" ? "text-gray-400" : "text-gray-500";
 
   return (
     <div

@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     }
 
     // Return user without password
-    const { password: _, ...userWithoutPassword } = user;
+    const { password: _password, ...userWithoutPassword } = user;
     return NextResponse.json(userWithoutPassword);
   } catch (error) {
     console.error("Error authenticating user:", error);

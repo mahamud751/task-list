@@ -62,9 +62,22 @@ const DropZone = ({
     }),
   }));
 
+  const dropRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (dropRef.current) {
+      try {
+        drop(dropRef.current);
+      } catch (e) {
+        // Ignore React DnD ref handling errors
+        console.debug("React DnD ref handling error:", e);
+      }
+    }
+  }, [drop]);
+
   return (
     <div
-      ref={drop}
+      ref={dropRef}
       className={`h-3 w-full rounded-lg transition-all duration-200 mx-auto my-1 ${
         isOver
           ? "bg-indigo-500 h-6 shadow-lg transform scale-105"
@@ -110,8 +123,12 @@ export default function Column({
   // Attach the drop ref to our columnRef
   useEffect(() => {
     if (columnRef.current) {
-      // @ts-expect-error - React DnD ref handling
-      dropRef(columnRef.current);
+      try {
+        dropRef(columnRef.current);
+      } catch (e) {
+        // Ignore React DnD ref handling errors
+        console.debug("React DnD ref handling error:", e);
+      }
     }
   }, [dropRef, canDrop]);
 

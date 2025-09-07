@@ -29,7 +29,7 @@ export default function TopNavbar({
     theme === "dark"
       ? "dark:bg-gray-800/90 backdrop-blur-sm"
       : "bg-white/90 backdrop-blur-sm";
-  const headerTextColor = theme === "dark" ? "text-white" : "text-gray-900";
+
   const navItemActiveBgColor =
     theme === "dark"
       ? "dark:bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md"

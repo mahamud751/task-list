@@ -4,6 +4,58 @@ import { useState, useEffect, createContext, useContext } from "react";
 import * as api from "../../lib/api";
 import { userService, User } from "../../services/userService";
 
+// Define interfaces for sprint and other data structures
+export interface SprintType {
+  id: string;
+  name: string;
+  description?: string;
+  startDate?: Date;
+  endDate?: Date;
+  status: string;
+  tasks: TaskApiType[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface TaskApiType {
+  id: string;
+  taskId: string;
+  title: string;
+  description: string;
+  priority: string;
+  storyPoints?: number;
+  progress?: number;
+  timeEstimate?: string;
+  module?: string;
+  target?: string;
+  imageUrl?: string;
+  sprintId?: string;
+  columnId: string; // Add this missing field
+  order?: number;
+  startDate?: Date;
+  dueDate?: Date;
+  assignee?: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+  };
+  column: {
+    id: string;
+    title: string;
+  };
+  sprint?: SprintType;
+}
+
+interface ColumnApiType {
+  id: string;
+  title: string;
+  order: number;
+  tasks: TaskApiType[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 // Define CardType with all necessary fields for database operations
 interface CardType {
   id: string;
@@ -20,6 +72,8 @@ interface CardType {
   imageUrl?: string;
   sprintId?: string;
   order?: number; // Add order field
+  startDate?: string;
+  dueDate?: string;
 }
 
 // Define ColumnType interface
@@ -31,8 +85,8 @@ interface ColumnType {
 
 interface DataContextType {
   columns: ColumnType[];
-  sprints: any[];
-  currentSprint: any | null;
+  sprints: SprintType[];
+  currentSprint: SprintType | null;
   loading: boolean;
   error: string | null;
   currentUser: User | null;
@@ -52,9 +106,16 @@ interface DataContextType {
   ) => Promise<void>;
   // Sprint functions
   refreshSprints: () => Promise<void>;
-  setCurrentSprint: (sprint: any | null) => void;
-  addSprint: (sprint: any) => Promise<void>;
-  updateSprint: (id: string, sprint: any) => Promise<void>;
+  setCurrentSprint: (sprint: SprintType | null) => void;
+  addSprint: (
+    sprint: Omit<SprintType, "id" | "createdAt" | "updatedAt" | "tasks">
+  ) => Promise<void>;
+  updateSprint: (
+    id: string,
+    sprint: Partial<
+      Omit<SprintType, "id" | "createdAt" | "updatedAt" | "tasks">
+    >
+  ) => Promise<void>;
   deleteSprint: (id: string) => Promise<void>;
   // User functions
   setCurrentUser: (user: User | null) => void;
@@ -79,8 +140,8 @@ const DatabaseContext = createContext<DataContextType | undefined>(undefined);
 
 export function DatabaseProvider({ children }: { children: React.ReactNode }) {
   const [columns, setColumns] = useState<ColumnType[]>([]);
-  const [sprints, setSprints] = useState<any[]>([]);
-  const [currentSprint, setCurrentSprint] = useState<any | null>(null);
+  const [sprints, setSprints] = useState<SprintType[]>([]);
+  const [currentSprint, setCurrentSprint] = useState<SprintType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -120,10 +181,10 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
       const data = await api.fetchColumns();
 
       // Transform API data to match frontend types
-      const transformedData = data.map((column: any) => ({
+      const transformedData = data.map((column: ColumnApiType) => ({
         id: column.id,
         title: column.title,
-        cards: column.tasks.map((task: any) => ({
+        cards: column.tasks.map((task: TaskApiType) => ({
           id: task.id,
           taskId: task.taskId,
           title: task.title,
@@ -382,10 +443,13 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
         }
       } else {
         // Moving to a different column or no specific position specified
-        const updates: any = { id: cardId, columnId: toColumnId };
+        const updates: Partial<TaskApiType> & { columnId?: string } = {
+          id: cardId,
+        };
 
         // If moving to a different column, put at the end
         if (fromColumnId !== toColumnId) {
+          updates.columnId = toColumnId; // This is the correct field for API requests
           const targetColumn = columns.find((col) => col.id === toColumnId);
           if (targetColumn) {
             updates.order = targetColumn.cards.length;
@@ -415,7 +479,9 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const addSprint = async (sprint: any) => {
+  const addSprint = async (
+    sprint: Omit<SprintType, "id" | "createdAt" | "updatedAt" | "tasks">
+  ) => {
     // Check if user has permission to create sprints
     if (
       currentUser &&
@@ -445,7 +511,12 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const updateSprint = async (id: string, sprint: any) => {
+  const updateSprint = async (
+    id: string,
+    sprint: Partial<
+      Omit<SprintType, "id" | "createdAt" | "updatedAt" | "tasks">
+    >
+  ) => {
     // Check if user has permission to edit sprints
     if (
       currentUser &&

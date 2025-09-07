@@ -1,5 +1,30 @@
 import { prisma } from "../lib/prisma";
-import { CardType, ColumnType } from "../app/components/DataProvider";
+
+interface CardType {
+  id: string;
+  taskId?: string;
+  title: string;
+  description: string;
+  priority: string;
+  storyPoints?: number;
+  assignee?: string;
+  progress?: number;
+  timeEstimate?: string;
+  module?: string;
+  target?: string;
+  imageUrl?: string;
+  sprintId?: string;
+  columnId?: string;
+  order?: number;
+  startDate?: Date;
+  dueDate?: Date;
+}
+
+interface ColumnType {
+  id: string;
+  title: string;
+  cards: CardType[];
+}
 
 // Column operations
 export async function getColumns() {
