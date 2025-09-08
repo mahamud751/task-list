@@ -498,31 +498,32 @@ export default function SprintDetailView({
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 ml-64 pt-16">
+      <main className="flex-1 pt-16">
         <div
           className={`p-6 ${
             theme === "dark" ? "dark:bg-gray-900" : "bg-gray-50"
           }`}
         >
-          <div className="flex space-x-4 overflow-x-auto pb-4">
+          <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredColumns.map((column, index) => (
-              <motion.div
-                key={column.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
-              >
-                <Column
-                  id={column.id}
-                  title={column.title}
-                  cards={column.cards.map((card) => ({
-                    ...card,
-                    taskId: card.taskId || `TASK-${card.id}`,
-                  }))}
-                  moveCard={moveCard}
-                  onCardClick={handleCardClick}
-                />
-              </motion.div>
+              <div key={column.id} className="min-w-0">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                >
+                  <Column
+                    id={column.id}
+                    title={column.title}
+                    cards={column.cards.map((card) => ({
+                      ...card,
+                      taskId: card.taskId || `TASK-${card.id}`,
+                    }))}
+                    moveCard={moveCard}
+                    onCardClick={handleCardClick}
+                  />
+                </motion.div>
+              </div>
             ))}
           </div>
         </div>

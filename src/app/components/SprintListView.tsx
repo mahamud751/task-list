@@ -18,11 +18,9 @@ interface FilterOptions {
 
 export default function SprintListView({
   onSprintSelect,
-
   filters,
 }: {
   onSprintSelect: (sprint: SprintType) => void;
-
   filters: FilterOptions;
 }) {
   const { sprints, addSprint } = useDatabase();

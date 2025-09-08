@@ -117,14 +117,20 @@ function HomeContent() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
-      {!selectedSprint && (
-        <>
-          <TopNavbar activeView={activeView} onViewChange={setActiveView} />
-          <Sidebar onFilterChange={setFilters} />
-        </>
+      <TopNavbar activeView={activeView} onViewChange={setActiveView} />
+
+      {/* Show sidebar filters only in sprint detail view or timeline view */}
+      {(selectedSprint || activeView === "timeline") && (
+        <Sidebar onFilterChange={setFilters} />
       )}
 
-      <div className={selectedSprint ? "flex-1" : "flex-1 ml-64 pt-16"}>
+      <div
+        className={
+          selectedSprint || activeView === "timeline"
+            ? "flex-1 ml-64 pt-16"
+            : "flex-1 pt-16"
+        }
+      >
         {activeView === "sprints" && !selectedSprint && (
           <SprintListView
             onSprintSelect={setSelectedSprint}
@@ -144,7 +150,7 @@ function HomeContent() {
         )}
 
         {activeView === "timeline" && !selectedSprint && (
-          <TimelineView tasks={timelineTasks} />
+          <TimelineView tasks={timelineTasks} filters={filters} />
         )}
 
         {/* Removed board view as requested */}

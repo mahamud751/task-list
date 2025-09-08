@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTheme } from "./ThemeProvider";
 
 interface TaskType {
@@ -20,9 +20,79 @@ interface TaskType {
   target?: string;
 }
 
-export default function TimelineView({ tasks }: { tasks: TaskType[] }) {
+interface FilterOptions {
+  searchTerm: string;
+  priority: string;
+  assignee: string;
+  module: string;
+  target: string;
+}
+
+export default function TimelineView({
+  tasks,
+  filters,
+}: {
+  tasks: TaskType[];
+  filters?: FilterOptions;
+}) {
   const [selectedTask, setSelectedTask] = useState<TaskType | null>(null);
+  const [filteredTasks, setFilteredTasks] = useState<TaskType[]>(tasks);
   const { theme } = useTheme();
+
+  // Apply filters whenever tasks or filters change
+  useEffect(() => {
+    if (!filters) {
+      setFilteredTasks(tasks);
+      return;
+    }
+
+    const filtered = tasks.filter((task) => {
+      // Search term filter
+      const matchesSearch =
+        filters.searchTerm === "" ||
+        task.title.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
+        (task.taskId &&
+          task.taskId
+            .toLowerCase()
+            .includes(filters.searchTerm.toLowerCase())) ||
+        (task.description &&
+          task.description
+            .toLowerCase()
+            .includes(filters.searchTerm.toLowerCase()));
+
+      // Priority filter
+      const matchesPriority =
+        filters.priority === "all" || task.priority === filters.priority;
+
+      // Assignee filter
+      const matchesAssignee =
+        filters.assignee === "all" ||
+        (task.assignee &&
+          task.assignee.toLowerCase().includes(filters.assignee.toLowerCase()));
+
+      // Module filter
+      const matchesModule =
+        filters.module === "all" ||
+        (task.module &&
+          task.module.toLowerCase().includes(filters.module.toLowerCase()));
+
+      // Target filter
+      const matchesTarget =
+        filters.target === "all" ||
+        (task.target &&
+          task.target.toLowerCase().includes(filters.target.toLowerCase()));
+
+      return (
+        matchesSearch &&
+        matchesPriority &&
+        matchesAssignee &&
+        matchesModule &&
+        matchesTarget
+      );
+    });
+
+    setFilteredTasks(filtered);
+  }, [tasks, filters]);
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -85,66 +155,68 @@ export default function TimelineView({ tasks }: { tasks: TaskType[] }) {
           Timeline View
         </h1>
         <p className={`mt-1 text-sm ${secondaryTextColor}`}>
-          Showing {tasks.length} tasks across all columns
+          Showing {filteredTasks.length} of {tasks.length} tasks
         </p>
       </div>
 
       <div className={`${backgroundColor} rounded-lg shadow overflow-hidden`}>
         <div className="overflow-x-auto">
-          <table className={`min-w-full divide-y ${dividerColor}`}>
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className={tableHeaderBg}>
               <tr>
                 <th
                   scope="col"
-                  className={`px-6 py-3 text-left text-xs font-medium ${secondaryTextColor} uppercase tracking-wider`}
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider md:px-6"
                 >
                   Task
                 </th>
                 <th
                   scope="col"
-                  className={`px-6 py-3 text-left text-xs font-medium ${secondaryTextColor} uppercase tracking-wider`}
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden sm:table-cell md:px-6"
                 >
                   Assignee
                 </th>
                 <th
                   scope="col"
-                  className={`px-6 py-3 text-left text-xs font-medium ${secondaryTextColor} uppercase tracking-wider`}
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider md:px-6"
                 >
                   Priority
                 </th>
                 <th
                   scope="col"
-                  className={`px-6 py-3 text-left text-xs font-medium ${secondaryTextColor} uppercase tracking-wider`}
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden md:table-cell md:px-6"
                 >
                   Progress
                 </th>
                 <th
                   scope="col"
-                  className={`px-6 py-3 text-left text-xs font-medium ${secondaryTextColor} uppercase tracking-wider`}
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden lg:table-cell md:px-6"
                 >
                   Dates
                 </th>
                 <th
                   scope="col"
-                  className={`px-6 py-3 text-left text-xs font-medium ${secondaryTextColor} uppercase tracking-wider`}
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider md:px-6"
                 >
                   Status
                 </th>
               </tr>
             </thead>
-            <tbody className={`${backgroundColor} ${dividerColor}`}>
-              {tasks.map((task) => (
+            <tbody
+              className={`${backgroundColor} divide-y divide-gray-200 dark:divide-gray-700`}
+            >
+              {filteredTasks.map((task) => (
                 <tr
                   key={task.id}
                   className={`${tableRowHover} cursor-pointer transition-colors duration-150`}
                   onClick={() => setSelectedTask(task)}
                 >
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 py-4 whitespace-nowrap md:px-6">
                     <div className="flex items-center">
                       <div
-                        className={`flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-full ${
+                        className={`flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full text-xs ${
                           theme === "dark" ? "bg-gray-600" : "bg-gray-200"
-                        }`}
+                        } md:h-10 md:w-10 md:text-sm`}
                       >
                         <span
                           className={
@@ -154,28 +226,32 @@ export default function TimelineView({ tasks }: { tasks: TaskType[] }) {
                           {task.title.charAt(0)}
                         </span>
                       </div>
-                      <div className="ml-4">
+                      <div className="ml-3 md:ml-4">
                         <div
-                          className={`text-sm font-medium ${headerTextColor}`}
+                          className={`text-sm font-medium ${headerTextColor} truncate max-w-[120px] md:max-w-xs`}
                         >
                           {task.taskId
                             ? `${task.taskId}: ${task.title}`
                             : task.title}
                         </div>
-                        <div className={`text-sm ${secondaryTextColor}`}>
+                        <div
+                          className={`text-xs ${secondaryTextColor} truncate max-w-[120px] md:max-w-xs md:text-sm hidden sm:block`}
+                        >
                           {task.description}
                         </div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 py-4 whitespace-nowrap hidden sm:table-cell md:px-6">
                     <div className="flex items-center">
                       {task.assignee ? (
                         <>
                           <div className="flex-shrink-0 h-8 w-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
                             {task.assignee.charAt(0).toUpperCase()}
                           </div>
-                          <div className={`ml-2 text-sm ${headerTextColor}`}>
+                          <div
+                            className={`ml-2 text-sm ${headerTextColor} truncate max-w-[80px] md:max-w-xs`}
+                          >
                             {task.assignee}
                           </div>
                         </>
@@ -186,7 +262,7 @@ export default function TimelineView({ tasks }: { tasks: TaskType[] }) {
                       )}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 py-4 whitespace-nowrap md:px-6">
                     <span
                       className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getPriorityColor(
                         task.priority
@@ -195,7 +271,7 @@ export default function TimelineView({ tasks }: { tasks: TaskType[] }) {
                       {task.priority}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 py-4 whitespace-nowrap hidden md:table-cell md:px-6">
                     {task.progress !== undefined ? (
                       <div>
                         <div
@@ -218,13 +294,11 @@ export default function TimelineView({ tasks }: { tasks: TaskType[] }) {
                       </span>
                     )}
                   </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-sm ${secondaryTextColor}`}
-                  >
+                  <td className="px-4 py-4 whitespace-nowrap text-xs text-gray-500 dark:text-gray-400 hidden lg:table-cell md:px-6">
                     <div>Start: {task.startDate}</div>
                     <div>Due: {task.dueDate}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 py-4 whitespace-nowrap md:px-6">
                     <span
                       className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getColumnColor(
                         task.columnId
@@ -278,7 +352,7 @@ export default function TimelineView({ tasks }: { tasks: TaskType[] }) {
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div>
                   <h3 className={`text-lg font-medium ${headerTextColor} mb-2`}>
                     Details
@@ -291,7 +365,7 @@ export default function TimelineView({ tasks }: { tasks: TaskType[] }) {
                     {selectedTask.description}
                   </p>
 
-                  <div className="space-y-3">
+                  <div className="space-y-3 mt-4">
                     <div>
                       <span
                         className={`text-sm font-medium ${secondaryTextColor}`}

@@ -184,7 +184,7 @@ export default function Column({
   return (
     <div
       ref={columnRef}
-      className={`bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-xl p-4 w-80 md:w-96 lg:w-[32rem] transition-all duration-300 shadow-lg ${
+      className={`bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-xl p-4 transition-all duration-300 shadow-lg ${
         isOver && canDrop
           ? "ring-4 ring-indigo-500 bg-gradient-to-b from-indigo-50 to-gray-100 dark:from-indigo-900/30 dark:to-gray-800 scale-[1.02]"
           : ""
