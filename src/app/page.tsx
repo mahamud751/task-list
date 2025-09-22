@@ -42,7 +42,14 @@ interface TimelineTaskType {
 }
 
 function HomeContent() {
-  const { currentUser, setCurrentUser, columns } = useDatabase();
+  const {
+    currentUser,
+    setCurrentUser,
+    columns,
+    sprints,
+    currentSprint,
+    setCurrentSprint,
+  } = useDatabase();
   const [activeView, setActiveView] = useState("sprints"); // Changed default to sprints
   const [selectedSprint, setSelectedSprint] = useState<SprintType | null>(null);
   const [filters, setFilters] = useState<FilterOptions>({
@@ -77,6 +84,12 @@ function HomeContent() {
     });
     setIsLoggedIn(true);
     setIsLoginModalOpen(false);
+  };
+
+  // Function to handle going back to sprints list
+  const handleBackToSprints = () => {
+    setSelectedSprint(null);
+    setCurrentSprint(null);
   };
 
   // Extract all tasks from columns to create timeline data
@@ -120,7 +133,14 @@ function HomeContent() {
       <TopNavbar
         activeView={activeView}
         onViewChange={setActiveView}
-        onOpenUserManagement={() => setIsUserManagementOpen(true)} // Add this prop
+        onOpenUserManagement={() => setIsUserManagementOpen(true)}
+        sprints={sprints} // Pass sprints data
+        currentSprint={currentSprint || selectedSprint} // Pass current sprint
+        onSprintSelect={(sprint) => {
+          setSelectedSprint(sprint);
+          setCurrentSprint(sprint);
+        }} // Handle sprint selection
+        onBackToSprints={handleBackToSprints} // Pass the back function
       />
 
       {/* Show sidebar filters only in sprint detail view or timeline view */}
@@ -145,7 +165,7 @@ function HomeContent() {
         {selectedSprint && (
           <SprintDetailView
             sprint={selectedSprint}
-            onBack={() => setSelectedSprint(null)}
+            onBack={handleBackToSprints}
             onFilterChange={setFilters}
             filters={filters}
             activeView={activeView}

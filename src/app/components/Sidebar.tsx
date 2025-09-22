@@ -18,7 +18,7 @@ export default function Sidebar({
 }: {
   onFilterChange: (filters: FilterOptions) => void;
 }) {
-  const { currentUser } = useDatabase();
+  const { currentUser, users } = useDatabase(); // Get users from DatabaseProvider
   const { theme } = useTheme();
   const [filters, setFilters] = useState<FilterOptions>({
     searchTerm: "",
@@ -143,10 +143,12 @@ export default function Sidebar({
               onChange={(e) => handleFilterChange("assignee", e.target.value)}
             >
               <option value="all">All Assignees</option>
-              <option value="Alex">Alex</option>
-              <option value="Sam">Sam</option>
-              <option value="Jordan">Jordan</option>
-              <option value="Taylor">Taylor</option>
+              {/* Dynamically generate assignee options from users data */}
+              {users.map((user) => (
+                <option key={user.id} value={user.name}>
+                  {user.name}
+                </option>
+              ))}
             </select>
           </div>
 

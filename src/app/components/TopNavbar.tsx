@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useDatabase } from "./DatabaseProvider";
 import ThemeToggle from "./ThemeToggle";
 import { useTheme } from "./ThemeProvider";
@@ -7,19 +8,27 @@ import { useTheme } from "./ThemeProvider";
 export default function TopNavbar({
   activeView,
   onViewChange,
-  onOpenUserManagement, // Add this prop
+  onOpenUserManagement,
+  sprints = [],
+  currentSprint,
+  onSprintSelect,
+  onBackToSprints, // Add this new prop
 }: {
   activeView: string;
   onViewChange: (view: string) => void;
-  onOpenUserManagement?: () => void; // Add this prop
+  onOpenUserManagement?: () => void;
+  sprints?: any[];
+  currentSprint?: any;
+  onSprintSelect?: (sprint: any) => void;
+  onBackToSprints?: () => void; // Add this new prop
 }) {
   const { currentUser, logout } = useDatabase();
   const { theme } = useTheme();
+  const [showSprintsDropdown, setShowSprintsDropdown] = useState(false);
 
   const navItems = [
     { id: "sprints", label: "Sprints" },
     { id: "timeline", label: "Timeline" },
-    // Removed "board" option as requested
   ];
 
   const handleLogout = () => {
@@ -74,7 +83,13 @@ export default function TopNavbar({
                 {navItems.map((item) => (
                   <button
                     key={item.id}
-                    onClick={() => onViewChange(item.id)}
+                    onClick={() => {
+                      onViewChange(item.id);
+                      // If we're going back to sprints view, also clear the selected sprint
+                      if (item.id === "sprints" && onBackToSprints) {
+                        onBackToSprints();
+                      }
+                    }}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 transform hover:scale-105 ${
                       activeView === item.id
                         ? navItemActiveBgColor
@@ -84,6 +99,101 @@ export default function TopNavbar({
                     {item.label}
                   </button>
                 ))}
+
+                {/* Show sprints dropdown when in sprints view or when a sprint is selected */}
+                {(activeView === "sprints" || currentSprint) &&
+                  sprints &&
+                  sprints.length > 0 && (
+                    <div className="relative">
+                      <button
+                        onClick={() =>
+                          setShowSprintsDropdown(!showSprintsDropdown)
+                        }
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center ${
+                          showSprintsDropdown
+                            ? navItemActiveBgColor
+                            : navItemInactiveTextColor
+                        }`}
+                      >
+                        {currentSprint ? currentSprint.name : "Select Sprint"}
+                        <svg
+                          className={`w-4 h-4 ml-2 transition-transform ${
+                            showSprintsDropdown ? "rotate-180" : ""
+                          }`}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M19 9l-7 7-7-7"
+                          ></path>
+                        </svg>
+                      </button>
+
+                      {showSprintsDropdown && (
+                        <div
+                          className={`absolute left-0 mt-2 w-64 rounded-lg shadow-lg py-2 ${userMenuBgColor} ${userMenuBorderColor} border z-50`}
+                        >
+                          <div className="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            Sprints
+                          </div>
+                          {sprints.map((sprint) => (
+                            <button
+                              key={sprint.id}
+                              onClick={() => {
+                                onSprintSelect && onSprintSelect(sprint);
+                                setShowSprintsDropdown(false);
+                              }}
+                              className={`block w-full text-left px-4 py-2 text-sm ${
+                                currentSprint?.id === sprint.id
+                                  ? "bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200"
+                                  : `${userMenuTextColor} ${userMenuHoverBgColor}`
+                              }`}
+                            >
+                              <div className="font-medium">{sprint.name}</div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400">
+                                {sprint.status} •{" "}
+                                {new Date(
+                                  sprint.startDate
+                                ).toLocaleDateString()}{" "}
+                                -{" "}
+                                {new Date(sprint.endDate).toLocaleDateString()}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                {/* Show "Back to Sprints" button when a sprint is selected */}
+                {currentSprint && (
+                  <button
+                    onClick={() => {
+                      onViewChange("sprints");
+                      onBackToSprints && onBackToSprints();
+                    }}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center ${navItemInactiveTextColor}`}
+                  >
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                      ></path>
+                    </svg>
+                    Back to Sprints
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -117,8 +227,8 @@ export default function TopNavbar({
             <ThemeToggle />
             {currentUser && (
               <div className="flex items-center space-x-3">
-                {/* Add User Management button for admin users */}
-                {currentUser.role === "admin" && onOpenUserManagement && (
+                {/* Always show Create User button for all users */}
+                {onOpenUserManagement && (
                   <button
                     onClick={onOpenUserManagement}
                     className="px-3 py-1.5 text-sm font-medium text-white bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 shadow-md"
@@ -144,6 +254,15 @@ export default function TopNavbar({
                       >
                         {currentUser.email}
                       </div>
+                      {currentSprint && (
+                        <div
+                          className={`text-xs mt-1 ${
+                            theme === "dark" ? "text-gray-400" : "text-gray-500"
+                          }`}
+                        >
+                          Current Sprint: {currentSprint.name}
+                        </div>
+                      )}
                     </div>
                     <button
                       onClick={handleLogout}
