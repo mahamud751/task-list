@@ -7,9 +7,11 @@ import { useTheme } from "./ThemeProvider";
 export default function TopNavbar({
   activeView,
   onViewChange,
+  onOpenUserManagement, // Add this prop
 }: {
   activeView: string;
   onViewChange: (view: string) => void;
+  onOpenUserManagement?: () => void; // Add this prop
 }) {
   const { currentUser, logout } = useDatabase();
   const { theme } = useTheme();
@@ -114,46 +116,57 @@ export default function TopNavbar({
             </div>
             <ThemeToggle />
             {currentUser && (
-              <div className="relative group">
-                <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-full w-10 h-10 flex items-center justify-center text-white font-bold cursor-pointer shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-110">
-                  {currentUser.name.charAt(0)}
-                </div>
-                <div
-                  className={`absolute right-0 mt-2 w-48 ${userMenuBgColor} rounded-xl shadow-xl py-2 hidden group-hover:block z-50 ${userMenuBorderColor} border transition-all duration-300 origin-top-right`}
-                >
-                  <div
-                    className={`px-4 py-3 text-sm border-b ${userMenuBorderColor} ${userMenuTextColor}`}
-                  >
-                    <div className="font-bold">{currentUser.name}</div>
-                    <div
-                      className={`text-xs mt-1 ${
-                        theme === "dark" ? "text-gray-400" : "text-gray-500"
-                      }`}
-                    >
-                      {currentUser.email}
-                    </div>
-                  </div>
+              <div className="flex items-center space-x-3">
+                {/* Add User Management button for admin users */}
+                {currentUser.role === "admin" && onOpenUserManagement && (
                   <button
-                    onClick={handleLogout}
-                    className={`block w-full text-left px-4 py-2 text-sm ${userMenuTextColor} ${userMenuHoverBgColor} transition-colors duration-200 rounded-b-xl`}
+                    onClick={onOpenUserManagement}
+                    className="px-3 py-1.5 text-sm font-medium text-white bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 shadow-md"
                   >
-                    <div className="flex items-center">
-                      <svg
-                        className="w-4 h-4 mr-2"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                        ></path>
-                      </svg>
-                      Sign out
-                    </div>
+                    Create User
                   </button>
+                )}
+                <div className="relative group">
+                  <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-full w-10 h-10 flex items-center justify-center text-white font-bold cursor-pointer shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-110">
+                    {currentUser.name.charAt(0)}
+                  </div>
+                  <div
+                    className={`absolute right-0 mt-2 w-48 ${userMenuBgColor} rounded-xl shadow-xl py-2 hidden group-hover:block z-50 ${userMenuBorderColor} border transition-all duration-300 origin-top-right`}
+                  >
+                    <div
+                      className={`px-4 py-3 text-sm border-b ${userMenuBorderColor} ${userMenuTextColor}`}
+                    >
+                      <div className="font-bold">{currentUser.name}</div>
+                      <div
+                        className={`text-xs mt-1 ${
+                          theme === "dark" ? "text-gray-400" : "text-gray-500"
+                        }`}
+                      >
+                        {currentUser.email}
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      className={`block w-full text-left px-4 py-2 text-sm ${userMenuTextColor} ${userMenuHoverBgColor} transition-colors duration-200 rounded-b-xl`}
+                    >
+                      <div className="flex items-center">
+                        <svg
+                          className="w-4 h-4 mr-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                          ></path>
+                        </svg>
+                        Sign out
+                      </div>
+                    </button>
+                  </div>
                 </div>
               </div>
             )}

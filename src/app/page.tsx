@@ -117,7 +117,11 @@ function HomeContent() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
-      <TopNavbar activeView={activeView} onViewChange={setActiveView} />
+      <TopNavbar
+        activeView={activeView}
+        onViewChange={setActiveView}
+        onOpenUserManagement={() => setIsUserManagementOpen(true)} // Add this prop
+      />
 
       {/* Show sidebar filters only in sprint detail view or timeline view */}
       {(selectedSprint || activeView === "timeline") && (
