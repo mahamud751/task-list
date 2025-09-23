@@ -25,6 +25,7 @@ export default function TopNavbar({
   const { currentUser, logout } = useDatabase();
   const { theme } = useTheme();
   const [showSprintsDropdown, setShowSprintsDropdown] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   const navItems = [
     { id: "sprints", label: "Sprints" },
@@ -236,56 +237,66 @@ export default function TopNavbar({
                     Create User
                   </button>
                 )}
-                <div className="relative group">
-                  <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-full w-10 h-10 flex items-center justify-center text-white font-bold cursor-pointer shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-110">
+                <div className="relative">
+                  <div
+                    className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-full w-10 h-10 flex items-center justify-center text-white font-bold cursor-pointer shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-110"
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                  >
                     {currentUser.name.charAt(0)}
                   </div>
-                  <div
-                    className={`absolute right-0 mt-2 w-48 ${userMenuBgColor} rounded-xl shadow-xl py-2 hidden group-hover:block z-50 ${userMenuBorderColor} border transition-all duration-300 origin-top-right`}
-                  >
+                  {showUserMenu && (
                     <div
-                      className={`px-4 py-3 text-sm border-b ${userMenuBorderColor} ${userMenuTextColor}`}
+                      className={`absolute right-0 mt-2 w-48 ${userMenuBgColor} rounded-xl shadow-xl py-2 z-50 ${userMenuBorderColor} border transition-all duration-300 origin-top-right`}
                     >
-                      <div className="font-bold">{currentUser.name}</div>
                       <div
-                        className={`text-xs mt-1 ${
-                          theme === "dark" ? "text-gray-400" : "text-gray-500"
-                        }`}
+                        className={`px-4 py-3 text-sm border-b ${userMenuBorderColor} ${userMenuTextColor}`}
                       >
-                        {currentUser.email}
-                      </div>
-                      {currentSprint && (
+                        <div className="font-bold">{currentUser.name}</div>
                         <div
                           className={`text-xs mt-1 ${
                             theme === "dark" ? "text-gray-400" : "text-gray-500"
                           }`}
                         >
-                          Current Sprint: {currentSprint.name}
+                          {currentUser.email}
                         </div>
-                      )}
-                    </div>
-                    <button
-                      onClick={handleLogout}
-                      className={`block w-full text-left px-4 py-2 text-sm ${userMenuTextColor} ${userMenuHoverBgColor} transition-colors duration-200 rounded-b-xl`}
-                    >
-                      <div className="flex items-center">
-                        <svg
-                          className="w-4 h-4 mr-2"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                          ></path>
-                        </svg>
-                        Sign out
+                        {currentSprint && (
+                          <div
+                            className={`text-xs mt-1 ${
+                              theme === "dark"
+                                ? "text-gray-400"
+                                : "text-gray-500"
+                            }`}
+                          >
+                            Current Sprint: {currentSprint.name}
+                          </div>
+                        )}
                       </div>
-                    </button>
-                  </div>
+                      <button
+                        onClick={() => {
+                          handleLogout();
+                          setShowUserMenu(false);
+                        }}
+                        className={`block w-full text-left px-4 py-2 text-sm ${userMenuTextColor} ${userMenuHoverBgColor} transition-colors duration-200 rounded-b-xl`}
+                      >
+                        <div className="flex items-center">
+                          <svg
+                            className="w-4 h-4 mr-2"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                            ></path>
+                          </svg>
+                          Sign out
+                        </div>
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

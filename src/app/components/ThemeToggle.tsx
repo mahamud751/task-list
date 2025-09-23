@@ -11,7 +11,7 @@ export default function ThemeToggle() {
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       onClick={toggleTheme}
-      className="relative rounded-full w-14 h-8 bg-gray-300 dark:bg-gray-600 flex items-center transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+      className="relative rounded-full w-14 h-8 bg-gray-300 dark:bg-gray-600 flex items-center transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-gray-800 card"
       aria-label="Toggle theme"
     >
       <motion.div

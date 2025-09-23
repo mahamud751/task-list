@@ -160,9 +160,9 @@ export default function TimelineView({
   const progressBarBg = theme === "dark" ? "dark:bg-gray-700" : "bg-gray-200";
 
   return (
-    <div className="p-6">
+    <div className="p-6 animate-fade-in-up">
       {/* Main header */}
-      <div className={`${backgroundColor} shadow-sm rounded-lg p-4 mb-6`}>
+      <div className={`${backgroundColor} shadow-sm rounded-lg p-4 mb-6 card`}>
         <h1 className={`text-2xl font-bold ${headerTextColor}`}>
           Timeline View
         </h1>
@@ -173,11 +173,13 @@ export default function TimelineView({
 
       {/* Sprint Filter */}
       {sprints && sprints.length > 0 && (
-        <div className={`${backgroundColor} shadow-sm rounded-lg p-4 mb-6`}>
+        <div
+          className={`${backgroundColor} shadow-sm rounded-lg p-4 mb-6 card animate-slide-in-left`}
+        >
           <div className="flex items-center">
             <label className={`mr-2 ${headerTextColor}`}>Sprint:</label>
             <select
-              className={`px-3 py-1 border rounded ${backgroundColor} ${headerTextColor}`}
+              className={`px-3 py-1 border rounded ${backgroundColor} ${headerTextColor} input-field`}
               value={filters?.sprintId || "all"}
               onChange={(e) => {
                 if (filters && onFilterChange) {
@@ -197,7 +199,9 @@ export default function TimelineView({
         </div>
       )}
 
-      <div className={`${backgroundColor} rounded-lg shadow overflow-hidden`}>
+      <div
+        className={`${backgroundColor} rounded-lg shadow overflow-hidden card`}
+      >
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className={tableHeaderBg}>
@@ -243,10 +247,11 @@ export default function TimelineView({
             <tbody
               className={`${backgroundColor} divide-y divide-gray-200 dark:divide-gray-700`}
             >
-              {filteredTasks.map((task) => (
+              {filteredTasks.map((task, index) => (
                 <tr
                   key={task.id}
-                  className={`${tableRowHover} cursor-pointer transition-colors duration-150`}
+                  className={`${tableRowHover} cursor-pointer transition-colors duration-150 card-hover animate-fade-in-up`}
+                  style={{ animationDelay: `${index * 50}ms` }}
                   onClick={() => setSelectedTask(task)}
                 >
                   <td className="px-4 py-4 whitespace-nowrap md:px-6">
@@ -304,7 +309,7 @@ export default function TimelineView({
                     <span
                       className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getPriorityColor(
                         task.priority
-                      )} text-white`}
+                      )} text-white animate-pulse`}
                     >
                       {task.priority}
                     </span>
@@ -354,9 +359,9 @@ export default function TimelineView({
 
       {/* Task Detail Modal */}
       {selectedTask && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-fade-in-up">
           <div
-            className={`${backgroundColor} rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-fade-in-up`}
+            className={`${backgroundColor} rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto card animate-bounce-in`}
           >
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">

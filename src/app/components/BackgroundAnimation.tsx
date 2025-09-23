@@ -116,11 +116,23 @@ export default function BackgroundAnimation() {
     const draw = () => {
       if (!ctx) return;
 
-      // Clear canvas with a theme-appropriate background
-      ctx.fillStyle =
-        theme === "dark"
-          ? "rgba(15, 23, 42, 0.05)" // Dark blue-gray for dark theme
-          : "rgba(255, 255, 255, 0.05)"; // White for light theme
+      // Clear canvas with a theme-appropriate background with subtle gradient
+      const gradient = ctx.createLinearGradient(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+
+      if (theme === "dark") {
+        gradient.addColorStop(0, "rgba(15, 23, 42, 0.03)"); // Dark blue-gray for dark theme
+        gradient.addColorStop(1, "rgba(30, 41, 59, 0.03)");
+      } else {
+        gradient.addColorStop(0, "rgba(248, 250, 252, 0.03)"); // Light gray for light theme
+        gradient.addColorStop(1, "rgba(226, 232, 240, 0.03)");
+      }
+
+      ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Draw regular bubbles with theme-appropriate colors
