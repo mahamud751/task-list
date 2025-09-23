@@ -29,7 +29,6 @@ export default function LoginModal({
   const [error, setError] = useState<string | null>(null);
 
   // Theme-based colors
-  const backgroundColor = theme === "dark" ? "dark:bg-gray-800" : "bg-white";
   const textColor = theme === "dark" ? "dark:text-white" : "text-gray-900";
   const secondaryTextColor =
     theme === "dark" ? "dark:text-gray-300" : "text-gray-700";
@@ -37,7 +36,6 @@ export default function LoginModal({
   const inputBorderColor =
     theme === "dark" ? "dark:border-gray-600" : "border-gray-300";
   const inputTextColor = theme === "dark" ? "dark:text-white" : "";
-  const footerBgColor = theme === "dark" ? "dark:bg-gray-700" : "bg-gray-50";
   const errorBgColor = theme === "dark" ? "bg-red-900" : "bg-red-100";
   const errorTextColor = theme === "dark" ? "text-red-200" : "text-red-700";
   const linkColor =
@@ -81,7 +79,7 @@ export default function LoginModal({
           onClick={onClose}
         >
           <motion.div
-            className={`rounded-lg shadow-xl w-full max-w-md ${backgroundColor}`}
+            className={`rounded-lg shadow-xl w-full max-w-md glass-card`}
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
@@ -95,7 +93,7 @@ export default function LoginModal({
             <form onSubmit={handleSubmit} className="px-6 py-4">
               {error && (
                 <div
-                  className={`mb-4 p-3 ${errorBgColor} ${errorTextColor} rounded-md`}
+                  className={`mb-4 p-3 ${errorBgColor} ${errorTextColor} rounded-md glass-card`}
                 >
                   {error}
                 </div>
@@ -110,7 +108,7 @@ export default function LoginModal({
                   <input
                     type="email"
                     required
-                    className={`w-full px-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-2 ${focusRingColor} ${focusBorderColor} ${inputBgColor} ${inputBorderColor} ${inputTextColor}`}
+                    className={`w-full px-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-2 ${focusRingColor} ${focusBorderColor} ${inputBgColor} ${inputBorderColor} ${inputTextColor} glass-card`}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
@@ -125,7 +123,7 @@ export default function LoginModal({
                   <input
                     type="password"
                     required
-                    className={`w-full px-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-2 ${focusRingColor} ${focusBorderColor} ${inputBgColor} ${inputBorderColor} ${inputTextColor}`}
+                    className={`w-full px-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-2 ${focusRingColor} ${focusBorderColor} ${inputBgColor} ${inputBorderColor} ${inputTextColor} glass-card`}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
@@ -137,7 +135,7 @@ export default function LoginModal({
                       id="remember-me"
                       name="remember-me"
                       type="checkbox"
-                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded glass-card"
                     />
                     <label
                       htmlFor="remember-me"
@@ -159,7 +157,7 @@ export default function LoginModal({
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 glass-card"
                 >
                   {isLoading ? (
                     <svg
@@ -187,7 +185,7 @@ export default function LoginModal({
                 </button>
               </div>
             </form>
-            <div className={`px-6 py-4 rounded-b-lg ${footerBgColor}`}>
+            <div className={`px-6 py-4 rounded-b-lg glass-card`}>
               <div
                 className={`text-sm ${
                   theme === "dark" ? "text-gray-400" : "text-gray-600"

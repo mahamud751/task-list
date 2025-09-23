@@ -152,10 +152,22 @@ function HomeContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
+    <div className="min-h-screen flex">
       <TopNavbar
         activeView={activeView}
-        onViewChange={setActiveView}
+        onViewChange={(view) => {
+          setActiveView(view);
+          // If switching to timeline view, clear the selected sprint
+          if (view === "timeline") {
+            setSelectedSprint(null);
+            setCurrentSprint(null);
+          }
+          // If switching to sprints view, clear the selected sprint
+          if (view === "sprints") {
+            setSelectedSprint(null);
+            setCurrentSprint(null);
+          }
+        }}
         onOpenUserManagement={() => setIsUserManagementOpen(true)}
         sprints={sprints} // Pass sprints data
         currentSprint={currentSprint || selectedSprint} // Pass current sprint

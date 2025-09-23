@@ -22,25 +22,31 @@ export default function FloatingActionButton({
   }
 
   // Theme-based colors
-  const buttonBgColor =
-    theme === "dark"
-      ? "bg-gradient-to-r from-blue-600 to-indigo-700"
-      : "bg-gradient-to-r from-blue-500 to-indigo-600";
-  const buttonHoverBgColor =
-    theme === "dark"
-      ? "hover:from-blue-500 hover:to-indigo-600"
-      : "hover:from-blue-400 hover:to-indigo-500";
   const focusRingColor =
     theme === "dark" ? "focus:ring-blue-500" : "focus:ring-blue-400";
+  const buttonBgColor =
+    theme === "dark"
+      ? "bg-gradient-to-br from-indigo-600 to-purple-600"
+      : "bg-gradient-to-br from-indigo-600 to-purple-600";
+  const hoverBgColor =
+    theme === "dark"
+      ? "hover:from-indigo-700 hover:to-purple-700"
+      : "hover:from-indigo-700 hover:to-purple-700";
+  const borderColor =
+    theme === "dark" ? "border-indigo-400/30" : "border-indigo-300/50";
+  const boxShadow =
+    theme === "dark"
+      ? "shadow-lg hover:shadow-xl"
+      : "shadow-lg hover:shadow-xl shadow-indigo-500/30";
 
   return (
     <button
       onClick={onClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className={`fixed bottom-8 right-8 w-16 h-16 rounded-full ${buttonBgColor} text-white shadow-lg flex items-center justify-center transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-4 ${focusRingColor} focus:ring-opacity-50 ${
+      className={`fixed bottom-8 right-8 w-16 h-16 rounded-full text-white flex items-center justify-center transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-4 ${focusRingColor} focus:ring-opacity-50 ${
         isHovered ? "rotate-90" : "rotate-0"
-      } ${buttonHoverBgColor} shadow-lg hover:shadow-xl`}
+      } ${boxShadow} ${buttonBgColor} ${hoverBgColor} ${borderColor}`}
       aria-label="Add new task"
     >
       <div className="relative">

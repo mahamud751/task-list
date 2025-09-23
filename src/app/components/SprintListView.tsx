@@ -92,11 +92,12 @@ export default function SprintListView({
 
   // Theme-based colors
   const headerTextColor = theme === "dark" ? "text-white" : "text-gray-900";
-  const cardBgColor = theme === "dark" ? "dark:bg-gray-800" : "bg-white";
-  const cardBorderColor =
-    theme === "dark" ? "dark:border-gray-700" : "border-gray-200";
   const descriptionTextColor =
-    theme === "dark" ? "text-gray-300" : "text-gray-600";
+    theme === "dark" ? "text-gray-300" : "text-gray-700";
+  const secondaryTextColor =
+    theme === "dark" ? "text-gray-400" : "text-gray-600";
+  const progressTextColor =
+    theme === "dark" ? "text-gray-400" : "text-gray-500";
 
   return (
     <div
@@ -127,7 +128,7 @@ export default function SprintListView({
                 y: -10,
                 boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
               }}
-              className={`${cardBgColor} rounded-xl shadow-lg overflow-hidden cursor-pointer ${cardBorderColor} border transition-all duration-300 transform hover:scale-[1.02]`}
+              className="glass-card rounded-xl shadow-lg overflow-hidden cursor-pointer border transition-all duration-300 transform hover:scale-[1.02] glass-card-hover"
               onClick={() => onSprintSelect(sprint)}
             >
               <div className={`h-2 ${getStatusColor(sprint.status)}`}></div>
@@ -152,10 +153,8 @@ export default function SprintListView({
                 {/* Progress bar */}
                 <div className="mt-4">
                   <div className="flex justify-between text-xs mb-1">
-                    <span className="text-gray-500 dark:text-gray-400">
-                      Progress
-                    </span>
-                    <span className="text-gray-500 dark:text-gray-400">
+                    <span className={progressTextColor}>Progress</span>
+                    <span className={progressTextColor}>
                       {averageProgress}%
                     </span>
                   </div>
@@ -168,7 +167,7 @@ export default function SprintListView({
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {sprint.startDate && (
-                    <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
+                    <div className="flex items-center text-xs">
                       <svg
                         className="w-4 h-4 mr-1"
                         fill="none"
@@ -182,13 +181,13 @@ export default function SprintListView({
                           d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                         ></path>
                       </svg>
-                      <span>
+                      <span className={secondaryTextColor}>
                         {new Date(sprint.startDate).toLocaleDateString()}
                       </span>
                     </div>
                   )}
                   {sprint.endDate && (
-                    <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
+                    <div className="flex items-center text-xs">
                       <svg
                         className="w-4 h-4 mr-1"
                         fill="none"
@@ -202,7 +201,7 @@ export default function SprintListView({
                           d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                         ></path>
                       </svg>
-                      <span>
+                      <span className={secondaryTextColor}>
                         {new Date(sprint.endDate).toLocaleDateString()}
                       </span>
                     </div>
@@ -210,7 +209,7 @@ export default function SprintListView({
                 </div>
                 <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                    <span className={`text-xs ${secondaryTextColor}`}>
                       {totalTasks} tasks
                     </span>
                     <div className="flex space-x-1">

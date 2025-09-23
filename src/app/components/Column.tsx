@@ -169,18 +169,18 @@ export default function Column({
     }
   };
 
-  // Calculate priority counts for the header
-  const priorityCounts = {
-    critical: cards.filter((card) => card.priority === "critical").length,
-    high: cards.filter((card) => card.priority === "high").length,
-    medium: cards.filter((card) => card.priority === "medium").length,
-    low: cards.filter((card) => card.priority === "low").length,
-  };
-
   // Sort cards by order
   const sortedCards = [...cards].sort(
     (a, b) => (a.order || 0) - (b.order || 0)
   );
+
+  // Calculate priority counts for the header
+  const priorityCounts = {
+    critical: sortedCards.filter((card) => card.priority === "critical").length,
+    high: sortedCards.filter((card) => card.priority === "high").length,
+    medium: sortedCards.filter((card) => card.priority === "medium").length,
+    low: sortedCards.filter((card) => card.priority === "low").length,
+  };
 
   return (
     <div
@@ -200,7 +200,7 @@ export default function Column({
             animate={{ scale: 1 }}
             transition={{ delay: 0.1 }}
           >
-            {cards.length}
+            {sortedCards.length}
           </motion.span>
         </h2>
         <div className="flex space-x-1">

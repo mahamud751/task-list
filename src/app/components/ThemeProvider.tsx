@@ -88,8 +88,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      <BackgroundAnimation />
-      {children}
+      <div className="fixed inset-0 z-0">
+        <BackgroundAnimation />
+      </div>
+      <div className="relative z-10">{children}</div>
     </ThemeContext.Provider>
   );
 }

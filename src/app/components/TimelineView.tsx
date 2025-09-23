@@ -150,7 +150,8 @@ export default function TimelineView({
   // Theme-based text colors
   const headerTextColor = theme === "dark" ? "text-white" : "text-gray-900";
   const secondaryTextColor =
-    theme === "dark" ? "text-gray-300" : "text-gray-500";
+    theme === "dark" ? "text-gray-300" : "text-gray-700";
+  const mutedTextColor = theme === "dark" ? "text-gray-400" : "text-gray-600";
   const backgroundColor = theme === "dark" ? "dark:bg-gray-800" : "bg-white";
   const tableHeaderBg = theme === "dark" ? "dark:bg-gray-700" : "bg-gray-50";
   const tableRowHover =
@@ -162,7 +163,7 @@ export default function TimelineView({
   return (
     <div className="p-6 animate-fade-in-up">
       {/* Main header */}
-      <div className={`${backgroundColor} shadow-sm rounded-lg p-4 mb-6 card`}>
+      <div className={`shadow-sm rounded-lg p-4 mb-6 glass-card`}>
         <h1 className={`text-2xl font-bold ${headerTextColor}`}>
           Timeline View
         </h1>
@@ -174,12 +175,12 @@ export default function TimelineView({
       {/* Sprint Filter */}
       {sprints && sprints.length > 0 && (
         <div
-          className={`${backgroundColor} shadow-sm rounded-lg p-4 mb-6 card animate-slide-in-left`}
+          className={`shadow-sm rounded-lg p-4 mb-6 glass-card animate-slide-in-left`}
         >
           <div className="flex items-center">
             <label className={`mr-2 ${headerTextColor}`}>Sprint:</label>
             <select
-              className={`px-3 py-1 border rounded ${backgroundColor} ${headerTextColor} input-field`}
+              className={`px-3 py-1 border rounded glass-card ${headerTextColor} input-field`}
               value={filters?.sprintId || "all"}
               onChange={(e) => {
                 if (filters && onFilterChange) {
@@ -199,58 +200,54 @@ export default function TimelineView({
         </div>
       )}
 
-      <div
-        className={`${backgroundColor} rounded-lg shadow overflow-hidden card`}
-      >
+      <div className={`rounded-lg shadow overflow-hidden glass-card`}>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className={tableHeaderBg}>
               <tr>
                 <th
                   scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider md:px-6"
+                  className={`px-4 py-3 text-left text-xs font-medium uppercase tracking-wider md:px-6 ${mutedTextColor}`}
                 >
                   Task
                 </th>
                 <th
                   scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden sm:table-cell md:px-6"
+                  className={`px-4 py-3 text-left text-xs font-medium uppercase tracking-wider hidden sm:table-cell md:px-6 ${mutedTextColor}`}
                 >
                   Assignee
                 </th>
                 <th
                   scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider md:px-6"
+                  className={`px-4 py-3 text-left text-xs font-medium uppercase tracking-wider md:px-6 ${mutedTextColor}`}
                 >
                   Priority
                 </th>
                 <th
                   scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden md:table-cell md:px-6"
+                  className={`px-4 py-3 text-left text-xs font-medium uppercase tracking-wider hidden md:table-cell md:px-6 ${mutedTextColor}`}
                 >
                   Progress
                 </th>
                 <th
                   scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden lg:table-cell md:px-6"
+                  className={`px-4 py-3 text-left text-xs font-medium uppercase tracking-wider hidden lg:table-cell md:px-6 ${mutedTextColor}`}
                 >
                   Dates
                 </th>
                 <th
                   scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider md:px-6"
+                  className={`px-4 py-3 text-left text-xs font-medium uppercase tracking-wider md:px-6 ${mutedTextColor}`}
                 >
                   Status
                 </th>
               </tr>
             </thead>
-            <tbody
-              className={`${backgroundColor} divide-y divide-gray-200 dark:divide-gray-700`}
-            >
+            <tbody className={`divide-y divide-gray-200 dark:divide-gray-700`}>
               {filteredTasks.map((task, index) => (
                 <tr
                   key={task.id}
-                  className={`${tableRowHover} cursor-pointer transition-colors duration-150 card-hover animate-fade-in-up`}
+                  className={`cursor-pointer transition-colors duration-150 glass-card-hover animate-fade-in-up`}
                   style={{ animationDelay: `${index * 50}ms` }}
                   onClick={() => setSelectedTask(task)}
                 >
@@ -278,7 +275,7 @@ export default function TimelineView({
                             : task.title}
                         </div>
                         <div
-                          className={`text-xs ${secondaryTextColor} truncate max-w-[120px] md:max-w-xs md:text-sm hidden sm:block`}
+                          className={`text-xs truncate max-w-[120px] md:max-w-xs md:text-sm hidden sm:block ${secondaryTextColor}`}
                         >
                           {task.description}
                         </div>
@@ -337,9 +334,11 @@ export default function TimelineView({
                       </span>
                     )}
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-xs text-gray-500 dark:text-gray-400 hidden lg:table-cell md:px-6">
-                    <div>Start: {task.startDate}</div>
-                    <div>Due: {task.dueDate}</div>
+                  <td className="px-4 py-4 whitespace-nowrap text-xs hidden lg:table-cell md:px-6">
+                    <div className={mutedTextColor}>
+                      Start: {task.startDate}
+                    </div>
+                    <div className={mutedTextColor}>Due: {task.dueDate}</div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap md:px-6">
                     <span
@@ -361,7 +360,7 @@ export default function TimelineView({
       {selectedTask && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-fade-in-up">
           <div
-            className={`${backgroundColor} rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto card animate-bounce-in`}
+            className={`rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto glass-card animate-bounce-in`}
           >
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">

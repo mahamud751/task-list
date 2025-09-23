@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDatabase } from "./DatabaseProvider";
 import { useTheme } from "./ThemeProvider";
 
@@ -33,6 +33,13 @@ export default function Sidebar({
     }
   );
 
+  // Sync filters with currentFilters when it changes
+  useEffect(() => {
+    if (currentFilters) {
+      setFilters(currentFilters);
+    }
+  }, [currentFilters]);
+
   const handleFilterChange = (
     filterName: keyof FilterOptions,
     value: string
@@ -43,10 +50,9 @@ export default function Sidebar({
   };
 
   // Theme-based colors
-  const sidebarBgColor = theme === "dark" ? "dark:bg-gray-800" : "bg-white";
-  const sidebarBorderColor =
-    theme === "dark" ? "dark:border-gray-700" : "border-gray-200";
   const headerTextColor = theme === "dark" ? "text-white" : "text-gray-900";
+  const secondaryTextColor = theme === "dark" ? "text-gray-300" : "text-gray-700";
+  const mutedTextColor = theme === "dark" ? "text-gray-400" : "text-gray-600";
   const roleBadgeBgColor = (role: string) => {
     switch (role) {
       case "admin":
@@ -64,21 +70,19 @@ export default function Sidebar({
     }
   };
   const filterLabelColor = theme === "dark" ? "text-gray-300" : "text-gray-700";
-  const inputBgColor = theme === "dark" ? "dark:bg-gray-700" : "bg-white";
-  const inputBorderColor =
-    theme === "dark" ? "dark:border-gray-600" : "border-gray-300";
+  const inputBgColor = theme === "dark" ? "dark:bg-gray-700/50" : "bg-white/50";
+  const inputBorderColor = theme === "dark" ? "dark:border-gray-600" : "border-gray-300";
   const inputTextColor = theme === "dark" ? "dark:text-white" : "text-gray-900";
-  const selectBgColor = theme === "dark" ? "dark:bg-gray-700" : "bg-white";
-  const selectBorderColor =
-    theme === "dark" ? "dark:border-gray-600" : "border-gray-300";
-  const selectTextColor =
-    theme === "dark" ? "dark:text-white" : "text-gray-900";
+  const placeholderTextColor = theme === "dark" ? "dark:placeholder-gray-400" : "placeholder-gray-500";
+  const selectBgColor = theme === "dark" ? "dark:bg-gray-700/50" : "bg-white/50";
+  const selectBorderColor = theme === "dark" ? "dark:border-gray-600" : "border-gray-300";
+  const selectTextColor = theme === "dark" ? "dark:text-white" : "text-gray-900";
 
   return (
     <div
-      className={`w-64 fixed left-0 top-16 bottom-0 shadow-lg z-40 overflow-y-auto ${sidebarBgColor} ${sidebarBorderColor} border-r`}
+      className={`w-64 fixed left-0 top-16 bottom-0 shadow-lg z-40 overflow-y-auto glass-card border-r`}
     >
-      <div className={`p-4 ${sidebarBorderColor} border-b`}>
+      <div className={`p-4 border-b`}>
         <h1 className={`text-xl font-bold ${headerTextColor}`}>Filters</h1>
         {currentUser && (
           <div className="mt-2 flex items-center text-sm">
@@ -97,7 +101,7 @@ export default function Sidebar({
         <SprintSelector />
       </div> */}
 
-      <div className={`p-4 ${sidebarBorderColor} border-t`}>
+      <div className={`p-4 border-t`}>
         <h3 className={`text-sm font-medium ${headerTextColor} mb-3`}>
           Task Filters
         </h3>
@@ -111,7 +115,7 @@ export default function Sidebar({
             <input
               type="text"
               placeholder="Search tasks..."
-              className={`w-full px-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${inputBgColor} ${inputBorderColor} ${inputTextColor} transition-colors duration-200`}
+              className={`w-full px-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 glass-card transition-colors duration-200 ${inputBgColor} ${inputBorderColor} ${inputTextColor} ${placeholderTextColor}`}
               value={filters.searchTerm}
               onChange={(e) => handleFilterChange("searchTerm", e.target.value)}
             />
@@ -124,7 +128,7 @@ export default function Sidebar({
               Priority
             </label>
             <select
-              className={`w-full px-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${selectBgColor} ${selectBorderColor} ${selectTextColor} transition-colors duration-200`}
+              className={`w-full px-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 glass-card transition-colors duration-200 ${selectBgColor} ${selectBorderColor} ${selectTextColor}`}
               value={filters.priority}
               onChange={(e) => handleFilterChange("priority", e.target.value)}
             >
@@ -143,7 +147,7 @@ export default function Sidebar({
               Assignee
             </label>
             <select
-              className={`w-full px-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${selectBgColor} ${selectBorderColor} ${selectTextColor} transition-colors duration-200`}
+              className={`w-full px-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 glass-card transition-colors duration-200 ${selectBgColor} ${selectBorderColor} ${selectTextColor}`}
               value={filters.assignee}
               onChange={(e) => handleFilterChange("assignee", e.target.value)}
             >
@@ -164,7 +168,7 @@ export default function Sidebar({
               Module
             </label>
             <select
-              className={`w-full px-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${selectBgColor} ${selectBorderColor} ${selectTextColor} transition-colors duration-200`}
+              className={`w-full px-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 glass-card transition-colors duration-200 ${selectBgColor} ${selectBorderColor} ${selectTextColor}`}
               value={filters.module}
               onChange={(e) => handleFilterChange("module", e.target.value)}
             >
@@ -182,7 +186,7 @@ export default function Sidebar({
               Target
             </label>
             <select
-              className={`w-full px-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${selectBgColor} ${selectBorderColor} ${selectTextColor} transition-colors duration-200`}
+              className={`w-full px-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 glass-card transition-colors duration-200 ${selectBgColor} ${selectBorderColor} ${selectTextColor}`}
               value={filters.target}
               onChange={(e) => handleFilterChange("target", e.target.value)}
             >
@@ -200,7 +204,7 @@ export default function Sidebar({
               Sprint
             </label>
             <select
-              className={`w-full px-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${selectBgColor} ${selectBorderColor} ${selectTextColor} transition-colors duration-200`}
+              className={`w-full px-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 glass-card transition-colors duration-200 ${selectBgColor} ${selectBorderColor} ${selectTextColor}`}
               value={filters.sprintId}
               onChange={(e) => handleFilterChange("sprintId", e.target.value)}
             >

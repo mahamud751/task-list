@@ -72,6 +72,21 @@ export default function Card({
     }
   };
 
+  const getPriorityTextColor = (priority: string) => {
+    switch (priority) {
+      case "critical":
+        return "text-red-700 dark:text-red-400";
+      case "high":
+        return "text-orange-700 dark:text-orange-400";
+      case "medium":
+        return "text-yellow-700 dark:text-yellow-400";
+      case "low":
+        return "text-green-700 dark:text-green-400";
+      default:
+        return "text-gray-700 dark:text-gray-400";
+    }
+  };
+
   const getPriorityGlow = (priority: string) => {
     switch (priority) {
       case "critical":
@@ -133,9 +148,9 @@ export default function Card({
             <span className="text-xs font-medium text-indigo-600 dark:text-indigo-400 mr-2 flex-shrink-0">
               {taskId}
             </span>
-            <h3 className="font-semibold text-gray-800 dark:text-white truncate">
+            <h3 className="font-semibold text-gray-900 dark:text-white truncate">
               {" "}
-              {/* Added truncate */}
+              {/* Updated text color for better contrast */}
               {title}
             </h3>
           </div>
@@ -170,13 +185,15 @@ export default function Card({
         </div>
       </div>
 
-      <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-2 mt-2">
+      <p className="text-sm text-gray-700 dark:text-gray-300 mb-3 line-clamp-2 mt-2">
+        {/* Updated text color for better contrast */}
         {description}
       </p>
 
       {progress !== undefined && (
         <div className="mb-3">
-          <div className="flex justify-between text-xs text-gray-500 mb-1">
+          <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
+            {/* Updated text color for better contrast */}
             <span>Progress</span>
             <span>{progress}%</span>
           </div>
@@ -220,8 +237,10 @@ export default function Card({
                   d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                 ></path>
               </svg>
-              <span className="truncate max-w-[60px]">{timeEstimate}</span>{" "}
-              {/* Added truncate with max-width */}
+              <span className="truncate max-w-[60px] text-gray-600 dark:text-gray-400">
+                {timeEstimate}
+              </span>{" "}
+              {/* Updated text color for better contrast */}
             </div>
           )}
           {figmaLink && (
@@ -256,7 +275,7 @@ export default function Card({
                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
               ></path>
             </svg>
-            <span>2d</span>
+            <span className="text-gray-600 dark:text-gray-400">2d</span>
           </div>
         </div>
       </div>

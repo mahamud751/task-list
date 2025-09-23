@@ -37,10 +37,7 @@ export default function TopNavbar({
   };
 
   // Theme-based colors
-  const navbarBgColor =
-    theme === "dark"
-      ? "dark:bg-gray-800/90 backdrop-blur-sm"
-      : "bg-white/90 backdrop-blur-sm";
+  const navbarBgColor = "glass-card";
 
   const navItemActiveBgColor =
     theme === "dark"
@@ -55,7 +52,7 @@ export default function TopNavbar({
     theme === "dark" ? "dark:border-gray-600" : "border-gray-300";
   const searchInputTextColor =
     theme === "dark" ? "dark:text-white" : "text-gray-900";
-  const userMenuBgColor = theme === "dark" ? "dark:bg-gray-800" : "bg-white";
+  const userMenuBgColor = "glass-card";
   const userMenuBorderColor =
     theme === "dark" ? "dark:border-gray-700" : "border-gray-200";
   const userMenuTextColor =
@@ -88,6 +85,10 @@ export default function TopNavbar({
                       onViewChange(item.id);
                       // If we're going back to sprints view, also clear the selected sprint
                       if (item.id === "sprints" && onBackToSprints) {
+                        onBackToSprints();
+                      }
+                      // If we're going to timeline view, also clear the selected sprint
+                      if (item.id === "timeline" && onBackToSprints) {
                         onBackToSprints();
                       }
                     }}
@@ -232,7 +233,7 @@ export default function TopNavbar({
                 {onOpenUserManagement && (
                   <button
                     onClick={onOpenUserManagement}
-                    className="px-3 py-1.5 text-sm font-medium text-white bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 shadow-md"
+                    className="px-3 py-1.5 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-md hover:shadow-lg"
                   >
                     Create User
                   </button>
