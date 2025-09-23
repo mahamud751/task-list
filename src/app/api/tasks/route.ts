@@ -36,6 +36,7 @@ export async function POST(request: Request) {
         storyPoints: body.storyPoints,
         progress: body.progress || 0,
         timeEstimate: body.timeEstimate,
+        figmaLink: body.figmaLink,
         module: body.module,
         target: body.target,
         imageUrl: body.imageUrl,
@@ -96,6 +97,40 @@ export async function PATCH(request: Request) {
       updateData.dueDate = new Date(updateData.dueDate);
     }
 
+    // Handle sprint relationship
+    if (updateData.sprintId !== undefined) {
+      if (updateData.sprintId === null) {
+        // Disconnect sprint
+        updateData.sprint = { disconnect: true };
+        delete updateData.sprintId;
+      } else {
+        // Connect to sprint
+        updateData.sprint = {
+          connect: {
+            id: updateData.sprintId,
+          },
+        };
+        delete updateData.sprintId;
+      }
+    }
+
+    // Handle assignee relationship
+    if (updateData.assigneeId !== undefined) {
+      if (updateData.assigneeId === null) {
+        // Disconnect assignee
+        updateData.assignee = { disconnect: true };
+        delete updateData.assigneeId;
+      } else {
+        // Connect to assignee
+        updateData.assignee = {
+          connect: {
+            id: updateData.assigneeId,
+          },
+        };
+        delete updateData.assigneeId;
+      }
+    }
+
     const task = await prisma.task.update({
       where: { id },
       data: updateData,
@@ -134,6 +169,40 @@ export async function PUT(request: Request) {
     }
     if (updateData.dueDate) {
       updateData.dueDate = new Date(updateData.dueDate);
+    }
+
+    // Handle sprint relationship
+    if (updateData.sprintId !== undefined) {
+      if (updateData.sprintId === null) {
+        // Disconnect sprint
+        updateData.sprint = { disconnect: true };
+        delete updateData.sprintId;
+      } else {
+        // Connect to sprint
+        updateData.sprint = {
+          connect: {
+            id: updateData.sprintId,
+          },
+        };
+        delete updateData.sprintId;
+      }
+    }
+
+    // Handle assignee relationship
+    if (updateData.assigneeId !== undefined) {
+      if (updateData.assigneeId === null) {
+        // Disconnect assignee
+        updateData.assignee = { disconnect: true };
+        delete updateData.assigneeId;
+      } else {
+        // Connect to assignee
+        updateData.assignee = {
+          connect: {
+            id: updateData.assigneeId,
+          },
+        };
+        delete updateData.assigneeId;
+      }
     }
 
     const task = await prisma.task.update({

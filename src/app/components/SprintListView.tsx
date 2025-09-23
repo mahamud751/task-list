@@ -107,94 +107,124 @@ export default function SprintListView({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredSprints.map((sprint, index) => (
-          <motion.div
-            key={sprint.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: index * 0.1 }}
-            whileHover={{
-              y: -10,
-              boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
-            }}
-            className={`${cardBgColor} rounded-xl shadow-lg overflow-hidden cursor-pointer ${cardBorderColor} border transition-all duration-300 transform hover:scale-[1.02]`}
-            onClick={() => onSprintSelect(sprint)}
-          >
-            <div className={`h-2 ${getStatusColor(sprint.status)}`}></div>
-            <div className="p-6">
-              <div className="flex justify-between items-start">
-                <h2 className={`text-lg font-bold ${headerTextColor}`}>
-                  {sprint.name}
-                </h2>
-                <span
-                  className={`px-3 py-1 text-xs rounded-full ${getStatusColor(
-                    sprint.status
-                  )} ${getStatusTextColor(sprint.status)} shadow-sm`}
-                >
-                  {sprint.status}
-                </span>
-              </div>
-              {sprint.description && (
-                <p className={`mt-3 ${descriptionTextColor} line-clamp-2`}>
-                  {sprint.description}
-                </p>
-              )}
-              <div className="mt-4 flex flex-wrap gap-2">
-                {sprint.startDate && (
-                  <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
-                    <svg
-                      className="w-4 h-4 mr-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      ></path>
-                    </svg>
-                    <span>
-                      {new Date(sprint.startDate).toLocaleDateString()}
+        {filteredSprints.map((sprint, index) => {
+          // Calculate sprint progress as average of all task progresses
+          const totalTasks = sprint.tasks?.length || 0;
+          const totalProgress = sprint.tasks?.reduce(
+            (sum, task) => sum + (task.progress || 0),
+            0
+          );
+          const averageProgress =
+            totalTasks > 0 ? Math.round(totalProgress / totalTasks) : 0;
+
+          return (
+            <motion.div
+              key={sprint.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
+              whileHover={{
+                y: -10,
+                boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+              }}
+              className={`${cardBgColor} rounded-xl shadow-lg overflow-hidden cursor-pointer ${cardBorderColor} border transition-all duration-300 transform hover:scale-[1.02]`}
+              onClick={() => onSprintSelect(sprint)}
+            >
+              <div className={`h-2 ${getStatusColor(sprint.status)}`}></div>
+              <div className="p-6">
+                <div className="flex justify-between items-start">
+                  <h2 className={`text-lg font-bold ${headerTextColor}`}>
+                    {sprint.name}
+                  </h2>
+                  <span
+                    className={`px-3 py-1 text-xs rounded-full ${getStatusColor(
+                      sprint.status
+                    )} ${getStatusTextColor(sprint.status)} shadow-sm`}
+                  >
+                    {sprint.status}
+                  </span>
+                </div>
+                {sprint.description && (
+                  <p className={`mt-3 ${descriptionTextColor} line-clamp-2`}>
+                    {sprint.description}
+                  </p>
+                )}
+                {/* Progress bar */}
+                <div className="mt-4">
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="text-gray-500 dark:text-gray-400">
+                      Progress
+                    </span>
+                    <span className="text-gray-500 dark:text-gray-400">
+                      {averageProgress}%
                     </span>
                   </div>
-                )}
-                {sprint.endDate && (
-                  <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
-                    <svg
-                      className="w-4 h-4 mr-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      ></path>
-                    </svg>
-                    <span>{new Date(sprint.endDate).toLocaleDateString()}</span>
+                  <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
+                    <div
+                      className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full"
+                      style={{ width: `${averageProgress}%` }}
+                    ></div>
                   </div>
-                )}
-              </div>
-              <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                    {sprint.tasks?.length || 0} tasks
-                  </span>
-                  <div className="flex space-x-1">
-                    <div className="w-2 h-2 rounded-full bg-red-500"></div>
-                    <div className="w-2 h-2 rounded-full bg-orange-500"></div>
-                    <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
-                    <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {sprint.startDate && (
+                    <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
+                      <svg
+                        className="w-4 h-4 mr-1"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        ></path>
+                      </svg>
+                      <span>
+                        {new Date(sprint.startDate).toLocaleDateString()}
+                      </span>
+                    </div>
+                  )}
+                  {sprint.endDate && (
+                    <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
+                      <svg
+                        className="w-4 h-4 mr-1"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        ></path>
+                      </svg>
+                      <span>
+                        {new Date(sprint.endDate).toLocaleDateString()}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      {totalTasks} tasks
+                    </span>
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                      <div className="w-2 h-2 rounded-full bg-orange-500"></div>
+                      <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
+                      <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </motion.div>
-        ))}
+            </motion.div>
+          );
+        })}
       </div>
 
       <FloatingActionButton onClick={() => setIsCreateModalOpen(true)} />

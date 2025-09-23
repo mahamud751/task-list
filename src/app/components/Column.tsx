@@ -17,6 +17,7 @@ interface CardType {
   assignee?: string;
   progress?: number;
   timeEstimate?: string;
+  figmaLink?: string;
   module?: string;
   target?: string;
   imageUrl?: string;
@@ -253,6 +254,7 @@ export default function Column({
                 assignee={card.assignee}
                 progress={card.progress}
                 timeEstimate={card.timeEstimate}
+                figmaLink={card.figmaLink}
                 module={card.module}
                 target={card.target}
                 imageUrl={card.imageUrl}

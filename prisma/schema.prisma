@@ -51,6 +51,7 @@ model Task {
   storyPoints Int?
   progress    Int      @default(0)
   timeEstimate String?
+  figmaLink    String?  // URL to Figma design
   module      String?  // Frontend, Backend, App, etc.
   target      String?  // Target environment or system
   imageUrl    String?  // URL to task image attachment

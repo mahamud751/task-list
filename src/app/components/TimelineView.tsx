@@ -18,6 +18,7 @@ interface TaskType {
   columnId: string;
   module?: string;
   target?: string;
+  sprintId?: string; // Add sprintId field
 }
 
 interface FilterOptions {
@@ -26,14 +27,19 @@ interface FilterOptions {
   assignee: string;
   module: string;
   target: string;
+  sprintId: string; // Add sprintId filter
 }
 
 export default function TimelineView({
   tasks,
   filters,
+  onFilterChange,
+  sprints, // Add sprints prop
 }: {
   tasks: TaskType[];
   filters?: FilterOptions;
+  onFilterChange?: (filters: FilterOptions) => void;
+  sprints?: Array<{ id: string; name: string }>; // Add sprints prop type
 }) {
   const [selectedTask, setSelectedTask] = useState<TaskType | null>(null);
   const [filteredTasks, setFilteredTasks] = useState<TaskType[]>(tasks);
@@ -82,12 +88,18 @@ export default function TimelineView({
         (task.target &&
           task.target.toLowerCase().includes(filters.target.toLowerCase()));
 
+      // Sprint filter - handle case where task.sprintId might be undefined
+      const matchesSprint =
+        filters.sprintId === "all" ||
+        (task.sprintId && task.sprintId === filters.sprintId);
+
       return (
         matchesSearch &&
         matchesPriority &&
         matchesAssignee &&
         matchesModule &&
-        matchesTarget
+        matchesTarget &&
+        matchesSprint
       );
     });
 
@@ -158,6 +170,32 @@ export default function TimelineView({
           Showing {filteredTasks.length} of {tasks.length} tasks
         </p>
       </div>
+
+      {/* Sprint Filter */}
+      {sprints && sprints.length > 0 && (
+        <div className={`${backgroundColor} shadow-sm rounded-lg p-4 mb-6`}>
+          <div className="flex items-center">
+            <label className={`mr-2 ${headerTextColor}`}>Sprint:</label>
+            <select
+              className={`px-3 py-1 border rounded ${backgroundColor} ${headerTextColor}`}
+              value={filters?.sprintId || "all"}
+              onChange={(e) => {
+                if (filters && onFilterChange) {
+                  // Call the onFilterChange function with updated filters
+                  onFilterChange({ ...filters, sprintId: e.target.value });
+                }
+              }}
+            >
+              <option value="all">All Sprints</option>
+              {sprints.map((sprint) => (
+                <option key={sprint.id} value={sprint.id}>
+                  {sprint.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      )}
 
       <div className={`${backgroundColor} rounded-lg shadow overflow-hidden`}>
         <div className="overflow-x-auto">

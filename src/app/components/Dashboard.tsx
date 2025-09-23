@@ -353,42 +353,41 @@ export default function Dashboard({ filters }: { filters: FilterOptions }) {
               </div>
 
               <div className="mt-4">
-                <div
-                  className={`flex justify-between text-sm mb-1 ${
-                    theme === "dark" ? "text-gray-400" : "text-gray-500"
-                  }`}
-                >
-                  <span>Progress</span>
-                  <span>
-                    {
-                      sprint.tasks.filter(
-                        (t: TaskApiType) => t.progress === 100
-                      ).length
-                    }{" "}
-                    / {sprint.tasks.length} completed
-                  </span>
-                </div>
-                <div
-                  className={`w-full rounded-full h-2.5 ${progressBarBgColor}`}
-                >
-                  <motion.div
-                    className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2.5 rounded-full"
-                    initial={{ width: 0 }}
-                    animate={{
-                      width:
-                        sprint.tasks.length > 0
-                          ? `${
-                              (sprint.tasks.filter(
-                                (t: TaskApiType) => t.progress === 100
-                              ).length /
-                                sprint.tasks.length) *
-                              100
-                            }%`
-                          : "0%",
-                    }}
-                    transition={{ duration: 1, ease: "easeOut" }}
-                  ></motion.div>
-                </div>
+                {/* Calculate average progress for the sprint */}
+                {(() => {
+                  const totalTasks = sprint.tasks.length;
+                  const totalProgress = sprint.tasks.reduce(
+                    (sum, task) => sum + (task.progress || 0),
+                    0
+                  );
+                  const averageProgress =
+                    totalTasks > 0 ? Math.round(totalProgress / totalTasks) : 0;
+
+                  return (
+                    <>
+                      <div
+                        className={`flex justify-between text-sm mb-1 ${
+                          theme === "dark" ? "text-gray-400" : "text-gray-500"
+                        }`}
+                      >
+                        <span>Progress</span>
+                        <span>{averageProgress}%</span>
+                      </div>
+                      <div
+                        className={`w-full rounded-full h-2.5 ${progressBarBgColor}`}
+                      >
+                        <motion.div
+                          className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2.5 rounded-full"
+                          initial={{ width: 0 }}
+                          animate={{
+                            width: `${averageProgress}%`,
+                          }}
+                          transition={{ duration: 1, ease: "easeOut" }}
+                        ></motion.div>
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
 
               <div className="mt-4 flex flex-wrap gap-2">

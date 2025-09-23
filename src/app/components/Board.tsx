@@ -23,6 +23,7 @@ export default function Board() {
     storyPoints?: number;
     assignee?: string;
     timeEstimate?: string;
+    figmaLink?: string;
     module?: string;
     target?: string;
     imageUrl?: string;

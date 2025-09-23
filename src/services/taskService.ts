@@ -10,6 +10,7 @@ interface CardType {
   assignee?: string;
   progress?: number;
   timeEstimate?: string;
+  figmaLink?: string;
   module?: string;
   target?: string;
   imageUrl?: string;
@@ -117,6 +118,7 @@ export async function createTask(data: {
   storyPoints?: number;
   progress?: number;
   timeEstimate?: string;
+  figmaLink?: string;
   module?: string;
   target?: string;
   imageUrl?: string;
@@ -139,6 +141,7 @@ export async function createTask(data: {
         storyPoints: data.storyPoints,
         progress: data.progress || 0,
         timeEstimate: data.timeEstimate,
+        figmaLink: data.figmaLink,
         module: data.module,
         target: data.target,
         imageUrl: data.imageUrl,
@@ -167,6 +170,7 @@ export async function createTask(data: {
       assignee: task.assignee?.name || undefined,
       progress: task.progress,
       timeEstimate: task.timeEstimate || undefined,
+      figmaLink: task.figmaLink || undefined,
       module: task.module || undefined,
       target: task.target || undefined,
       imageUrl: task.imageUrl || undefined,
@@ -190,6 +194,7 @@ export async function updateTask(
     storyPoints?: number;
     progress?: number;
     timeEstimate?: string;
+    figmaLink?: string;
     module?: string;
     target?: string;
     imageUrl?: string;
@@ -211,6 +216,7 @@ export async function updateTask(
         storyPoints: data.storyPoints,
         progress: data.progress,
         timeEstimate: data.timeEstimate,
+        figmaLink: data.figmaLink,
         module: data.module,
         target: data.target,
         imageUrl: data.imageUrl,
@@ -245,6 +251,7 @@ export async function updateTask(
       assignee: task.assignee?.name || undefined,
       progress: task.progress,
       timeEstimate: task.timeEstimate || undefined,
+      figmaLink: task.figmaLink || undefined,
       module: task.module || undefined,
       target: task.target || undefined,
       imageUrl: task.imageUrl || undefined,

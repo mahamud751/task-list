@@ -15,6 +15,7 @@ interface TaskModalProps {
     storyPoints?: number;
     assignee?: string;
     timeEstimate?: string;
+    figmaLink?: string;
     module?: string;
     target?: string;
   }) => void;
@@ -49,6 +50,7 @@ export default function TaskModal({
   const [storyPoints, setStoryPoints] = useState<number | "">("");
   const [assignee, setAssignee] = useState("");
   const [timeEstimate, setTimeEstimate] = useState("");
+  const [figmaLink, setFigmaLink] = useState("");
   const [module, setModule] = useState(""); // Will be a dropdown
   const [target, setTarget] = useState(""); // Will be a dropdown
 
@@ -66,6 +68,7 @@ export default function TaskModal({
       storyPoints: storyPoints === "" ? undefined : Number(storyPoints),
       assignee: assignee || undefined,
       timeEstimate: timeEstimate || undefined,
+      figmaLink: figmaLink || undefined,
       module: module || undefined,
       target: target || undefined,
     });
@@ -85,6 +88,7 @@ export default function TaskModal({
     setStoryPoints("");
     setAssignee("");
     setTimeEstimate("");
+    setFigmaLink("");
     setModule("");
     setTarget("");
   };
@@ -284,18 +288,33 @@ export default function TaskModal({
                     <label
                       className={`block text-sm font-medium ${secondaryTextColor} mb-1`}
                     >
-                      Target
+                      Figma Link
                     </label>
-                    <select
+                    <input
+                      type="url"
                       className={`w-full px-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${inputBgColor} ${inputBorderColor} ${inputTextColor} transition-all duration-200`}
-                      value={target}
-                      onChange={(e) => setTarget(e.target.value)}
-                    >
-                      <option value="">Select Target</option>
-                      <option value="Web">Web</option>
-                      <option value="Mobile">Mobile</option>
-                    </select>
+                      value={figmaLink}
+                      onChange={(e) => setFigmaLink(e.target.value)}
+                      placeholder="https://figma.com/file/..."
+                    />
                   </div>
+                </div>
+
+                <div>
+                  <label
+                    className={`block text-sm font-medium ${secondaryTextColor} mb-1`}
+                  >
+                    Target
+                  </label>
+                  <select
+                    className={`w-full px-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${inputBgColor} ${inputBorderColor} ${inputTextColor} transition-all duration-200`}
+                    value={target}
+                    onChange={(e) => setTarget(e.target.value)}
+                  >
+                    <option value="">Select Target</option>
+                    <option value="Web">Web</option>
+                    <option value="Mobile">Mobile</option>
+                  </select>
                 </div>
 
                 {/* Removed the Image URL input field */}

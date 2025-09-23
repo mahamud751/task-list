@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { User } from "../services/userService";
 import {
   DatabaseProvider,
@@ -22,6 +22,7 @@ interface FilterOptions {
   assignee: string;
   module: string;
   target: string;
+  sprintId: string; // Add sprintId filter
 }
 
 interface TimelineTaskType {
@@ -39,6 +40,7 @@ interface TimelineTaskType {
   columnId: string;
   module?: string;
   target?: string;
+  sprintId?: string; // Add sprintId field
 }
 
 function HomeContent() {
@@ -58,6 +60,7 @@ function HomeContent() {
     assignee: "all",
     module: "all",
     target: "all",
+    sprintId: "all", // Add sprintId filter
   });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(true);
@@ -118,6 +121,7 @@ function HomeContent() {
           columnId: column.id,
           module: card.module,
           target: card.target,
+          sprintId: card.sprintId, // Add sprintId
         });
       });
     });
@@ -125,8 +129,27 @@ function HomeContent() {
     return allTasks;
   };
 
-  // Get all tasks for timeline view
-  const timelineTasks = getAllTasksFromColumns();
+  // Get all tasks for timeline view - make this a useMemo or similar to update when columns change
+  const timelineTasks = useMemo(() => getAllTasksFromColumns(), [columns]);
+
+  // Wrapper function to match the expected signature for timeline view
+  const handleTimelineFilterChange = (newFilters: FilterOptions) => {
+    setFilters(newFilters);
+  };
+
+  // Wrapper function to match the expected signature for sprint detail view
+  const handleSprintFilterChange = (newFilters: {
+    searchTerm: string;
+    priority: string;
+    assignee: string;
+    module: string;
+    target: string;
+  }) => {
+    setFilters({
+      ...filters,
+      ...newFilters,
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
@@ -145,7 +168,10 @@ function HomeContent() {
 
       {/* Show sidebar filters only in sprint detail view or timeline view */}
       {(selectedSprint || activeView === "timeline") && (
-        <Sidebar onFilterChange={setFilters} />
+        <Sidebar
+          onFilterChange={handleTimelineFilterChange}
+          currentFilters={filters} // Pass current filters
+        />
       )}
 
       <div
@@ -166,7 +192,7 @@ function HomeContent() {
           <SprintDetailView
             sprint={selectedSprint}
             onBack={handleBackToSprints}
-            onFilterChange={setFilters}
+            onFilterChange={handleSprintFilterChange}
             filters={filters}
             activeView={activeView}
             onViewChange={setActiveView}
@@ -174,7 +200,15 @@ function HomeContent() {
         )}
 
         {activeView === "timeline" && !selectedSprint && (
-          <TimelineView tasks={timelineTasks} filters={filters} />
+          <TimelineView
+            tasks={timelineTasks}
+            filters={filters}
+            onFilterChange={handleTimelineFilterChange}
+            sprints={sprints.map((sprint) => ({
+              id: sprint.id,
+              name: sprint.name,
+            }))} // Pass sprints data
+          />
         )}
 
         {/* Removed board view as requested */}

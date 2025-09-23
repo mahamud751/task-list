@@ -26,6 +26,7 @@ export interface TaskApiType {
   storyPoints?: number;
   progress?: number;
   timeEstimate?: string;
+  figmaLink?: string;
   module?: string;
   target?: string;
   imageUrl?: string;
@@ -67,6 +68,7 @@ interface CardType {
   assignee?: string;
   progress?: number;
   timeEstimate?: string;
+  figmaLink?: string;
   module?: string;
   target?: string;
   imageUrl?: string;
@@ -194,10 +196,11 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
           assignee: task.assignee?.name || undefined,
           progress: task.progress,
           timeEstimate: task.timeEstimate || undefined,
+          figmaLink: task.figmaLink || undefined,
           module: task.module || undefined,
           target: task.target || undefined,
           imageUrl: task.imageUrl || undefined,
-          sprintId: task.sprintId || undefined,
+          sprintId: task.sprint?.id || task.sprintId || undefined, // Use sprint.id if available, otherwise use sprintId
           order: task.order || undefined, // Add order field
           startDate: task.startDate
             ? new Date(task.startDate).toISOString().split("T")[0]
@@ -317,6 +320,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
         storyPoints: card.storyPoints,
         progress: card.progress,
         timeEstimate: card.timeEstimate,
+        figmaLink: card.figmaLink,
         module: card.module,
         target: card.target,
         imageUrl: card.imageUrl,
@@ -356,7 +360,11 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
           storyPoints: card.storyPoints,
           progress: card.progress,
           timeEstimate: card.timeEstimate,
+          figmaLink: card.figmaLink,
+          module: card.module,
+          target: card.target,
           assigneeId, // Add assigneeId to the API call
+          sprintId: card.sprintId, // Add sprintId to the API call
         }),
       });
 

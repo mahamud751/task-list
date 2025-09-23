@@ -14,6 +14,7 @@ interface CardType {
   assignee?: string;
   progress?: number;
   timeEstimate?: string;
+  figmaLink?: string;
   module?: string;
   target?: string;
   sprintId?: string;
@@ -42,6 +43,7 @@ export default function TaskEditModal({
   const [assignee, setAssignee] = useState("");
   const [progress, setProgress] = useState<number | "">("");
   const [timeEstimate, setTimeEstimate] = useState("");
+  const [figmaLink, setFigmaLink] = useState("");
   const [module, setModule] = useState("");
   const [target, setTarget] = useState("");
 
@@ -54,6 +56,7 @@ export default function TaskEditModal({
       setAssignee(task.assignee || "");
       setProgress(task.progress || "");
       setTimeEstimate(task.timeEstimate || "");
+      setFigmaLink(task.figmaLink || "");
       setModule(task.module || "");
       setTarget(task.target || "");
     }
@@ -76,6 +79,7 @@ export default function TaskEditModal({
         assignee: assignee || undefined,
         progress: progress === "" ? undefined : Number(progress),
         timeEstimate: timeEstimate || undefined,
+        figmaLink: figmaLink || undefined,
         module: module || undefined,
         target: target || undefined,
       });
@@ -180,39 +184,6 @@ export default function TaskEditModal({
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Progress
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      max="100"
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                      value={progress}
-                      onChange={(e) =>
-                        setProgress(
-                          e.target.value ? Number(e.target.value) : ""
-                        )
-                      }
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Time Estimate
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g., 2d, 3h"
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                      value={timeEstimate}
-                      onChange={(e) => setTimeEstimate(e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Assignee
                     </label>
                     <select
@@ -231,6 +202,54 @@ export default function TaskEditModal({
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Progress
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      value={progress}
+                      onChange={(e) =>
+                        setProgress(
+                          e.target.value ? Number(e.target.value) : ""
+                        )
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Time Estimate
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g., 2d, 3h"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      value={timeEstimate}
+                      onChange={(e) => setTimeEstimate(e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Figma Link
+                    </label>
+                    <input
+                      type="url"
+                      placeholder="https://figma.com/file/..."
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      value={figmaLink}
+                      onChange={(e) => setFigmaLink(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Module
                     </label>
                     <select
@@ -244,9 +263,7 @@ export default function TaskEditModal({
                       <option value="App">App</option>
                     </select>
                   </div>
-                </div>
 
-                <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Target

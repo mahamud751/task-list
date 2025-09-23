@@ -43,6 +43,7 @@ interface CardType {
   assigneeId?: string; // Add assigneeId property
   progress?: number;
   timeEstimate?: string;
+  figmaLink?: string;
   module?: string;
   target?: string;
   imageUrl?: string;

@@ -230,6 +230,23 @@ export default function SprintDetailView({
     onViewChange(view);
   };
 
+  // Calculate sprint progress as average of all task progresses
+  const calculateSprintProgress = () => {
+    const tasksInSprint = columns.flatMap((column) =>
+      column.cards.filter((card) => card.sprintId === sprint.id)
+    );
+
+    const totalTasks = tasksInSprint.length;
+    const totalProgress = tasksInSprint.reduce(
+      (sum, task) => sum + (task.progress || 0),
+      0
+    );
+
+    return totalTasks > 0 ? Math.round(totalProgress / totalTasks) : 0;
+  };
+
+  const sprintProgress = calculateSprintProgress();
+
   return (
     <div className="flex-1 flex">
       {/* Top Navigation */}
@@ -296,6 +313,23 @@ export default function SprintDetailView({
                 End: {new Date(sprint.endDate).toLocaleDateString()}
               </span>
             )}
+          </div>
+          {/* Sprint Progress Bar */}
+          <div className="mt-3">
+            <div className="flex justify-between text-xs mb-1">
+              <span className="text-gray-500 dark:text-gray-400">
+                Sprint Progress
+              </span>
+              <span className="text-gray-500 dark:text-gray-400">
+                {sprintProgress}%
+              </span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
+              <div
+                className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full"
+                style={{ width: `${sprintProgress}%` }}
+              ></div>
+            </div>
           </div>
         </div>
 

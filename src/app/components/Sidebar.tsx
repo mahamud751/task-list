@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import SprintSelector from "./SprintSelector";
 import { useDatabase } from "./DatabaseProvider";
 import { useTheme } from "./ThemeProvider";
 
@@ -11,22 +10,28 @@ interface FilterOptions {
   assignee: string;
   module: string;
   target: string;
+  sprintId: string; // Add sprintId filter
 }
 
 export default function Sidebar({
   onFilterChange,
+  currentFilters, // Add currentFilters prop
 }: {
   onFilterChange: (filters: FilterOptions) => void;
+  currentFilters?: FilterOptions; // Add currentFilters prop
 }) {
-  const { currentUser, users } = useDatabase(); // Get users from DatabaseProvider
+  const { currentUser, users, sprints } = useDatabase(); // Get users and sprints from DatabaseProvider
   const { theme } = useTheme();
-  const [filters, setFilters] = useState<FilterOptions>({
-    searchTerm: "",
-    priority: "all",
-    assignee: "all",
-    module: "all",
-    target: "all",
-  });
+  const [filters, setFilters] = useState<FilterOptions>(
+    currentFilters || {
+      searchTerm: "",
+      priority: "all",
+      assignee: "all",
+      module: "all",
+      target: "all",
+      sprintId: "all", // Add sprintId filter
+    }
+  );
 
   const handleFilterChange = (
     filterName: keyof FilterOptions,
@@ -88,9 +93,9 @@ export default function Sidebar({
         )}
       </div>
 
-      <div className="p-4">
+      {/* <div className="p-4">
         <SprintSelector />
-      </div>
+      </div> */}
 
       <div className={`p-4 ${sidebarBorderColor} border-t`}>
         <h3 className={`text-sm font-medium ${headerTextColor} mb-3`}>
@@ -184,6 +189,27 @@ export default function Sidebar({
               <option value="all">All Targets</option>
               <option value="Web">Web</option>
               <option value="Mobile">Mobile</option>
+            </select>
+          </div>
+
+          {/* Sprint Filter */}
+          <div>
+            <label
+              className={`block text-sm font-medium ${filterLabelColor} mb-1`}
+            >
+              Sprint
+            </label>
+            <select
+              className={`w-full px-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${selectBgColor} ${selectBorderColor} ${selectTextColor} transition-colors duration-200`}
+              value={filters.sprintId}
+              onChange={(e) => handleFilterChange("sprintId", e.target.value)}
+            >
+              <option value="all">All Sprints</option>
+              {sprints.map((sprint) => (
+                <option key={sprint.id} value={sprint.id}>
+                  {sprint.name}
+                </option>
+              ))}
             </select>
           </div>
         </div>
